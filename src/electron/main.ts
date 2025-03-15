@@ -1,18 +1,16 @@
 import {app, BrowserWindow, ipcMain } from "electron";
-import ElectronStore from "electron-store";
 import path from "path";
 
 let authWindow: BrowserWindow;
 let mainWindow: BrowserWindow;
-const store = new ElectronStore();
 
 function loginWindow(){
     authWindow = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences:{
-            nodeIntegration: true,
-            contextIsolation: false
+            //В продакшене использовать две .., в дев .
+            preload: path.join(app.getAppPath(), "./dist-electron/preload.cjs")
         }
     });
 
@@ -28,10 +26,6 @@ function MainWindow(){
         width: 800,
         height: 600,
         show: false,
-        webPreferences:{
-            nodeIntegration: true,
-            contextIsolation: false
-        }
     });
 
     mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "document"});
@@ -48,7 +42,6 @@ app.on("ready", () => {
 
 ipcMain.on("login-success", (event, token) => {
     console.log("Токен получен: ", token);
-    store.set("tokenAuth", token);
     if(authWindow) authWindow.close();
     if(mainWindow) mainWindow.show();
 })

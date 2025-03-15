@@ -1,6 +1,7 @@
 {
     "appId": "com.pagtion.vercel",
     "files": ["dist-electron", "dist-react"],
+    "extraResources": ["dist-electron/preload.cjs"],
     "icon": "./ppl-icon.ico",
     "mac": {
         "target": "dmg"
