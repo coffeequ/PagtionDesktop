@@ -1,47 +1,30 @@
-import {app, BrowserWindow, ipcMain } from "electron";
-import path from "path";
+import { app, BrowserWindow } from 'electron';
+import path from 'path';
 
-let authWindow: BrowserWindow;
+//Remind: В продакшене использовать две .., в дев .
 let mainWindow: BrowserWindow;
+function createMainWindow(){
 
-function loginWindow(){
-    authWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
-        webPreferences:{
-            //В продакшене использовать две .., в дев .
-            preload: path.join(app.getAppPath(), "./dist-electron/preload.cjs")
-        }
-    });
+  mainWindow = new BrowserWindow({
+      width: 800,
+      height: 600,
+      webPreferences:{
+          preload: path.join(app.getAppPath(), "./dist-electron/preload.cjs")
+      },
+  });
 
-    authWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "login"});
+  mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "login"});
 
-    authWindow.on("closed", () => {
-        authWindow.close();
-    });
+  mainWindow.on("closed", () => {
+      mainWindow.close(); 
+  });
 }
 
-function MainWindow(){
-    mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
-        show: false,
-    });
+app.whenReady().then(() => {
+  createMainWindow();
+});
 
-    mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "document"});
 
-    mainWindow.on("closed", () => {
-        mainWindow.close(); 
-    });
-}
-
-app.on("ready", () => {
-    loginWindow();
-    MainWindow();
-})
-
-ipcMain.on("login-success", (event, token) => {
-    console.log("Токен получен: ", token);
-    if(authWindow) authWindow.close();
-    if(mainWindow) mainWindow.show();
-})
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit();
+});
