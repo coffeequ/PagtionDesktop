@@ -22,7 +22,7 @@ export default function login() {
 
         const result = await response.json();
         
-        console.log( result );
+        console.log(result);
         
         return result;
         
@@ -58,7 +58,7 @@ export default function login() {
       ) }
       <button onClick={() => {
         //@ts-ignore
-        openGoogleAuth()
+        window.electronAPI.handleOpenGoogleProvirder();
       }}>Войти с помощью google</button>
     </div>
   )
