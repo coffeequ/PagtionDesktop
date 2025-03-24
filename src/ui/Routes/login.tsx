@@ -8,21 +8,24 @@ export default function login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-
       const response = await fetch('http://localhost:3000/api/authenticate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: "include",
         body: JSON.stringify({
           email, password
         }),
       });
-      const result = await response.json();
-      if (result.success) {
+      if (response.ok) {
         setStatus(true);
-        return { id: result};
+
+        const result = await response.json();
+        
+        console.log( result );
+        
+        return result;
+        
       } else {
         setStatus(false);
         return;
@@ -46,13 +49,17 @@ export default function login() {
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </label>
         <br />
-        <button type="submit">Отправить данные</button>
+        <button type="submit">Авторизироваться</button>
       </form>
       { status ? (
         <p >Успешный вход!</p>
       ) : (
         <p>Ошибка авторизации!</p>
       ) }
+      <button onClick={() => {
+        //@ts-ignore
+        openGoogleAuth()
+      }}>Войти с помощью google</button>
     </div>
   )
 }
