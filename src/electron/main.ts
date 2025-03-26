@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain, webContents } from 'electron';
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import path from 'path';
 
 interface IUser {
@@ -7,6 +7,7 @@ interface IUser {
   name: string,
   image: string | null
 }
+
 //Remind: В продакшене использовать две .., в дев .
 let mainWindow: BrowserWindow;
 
@@ -59,12 +60,13 @@ if (!gotTheLock) {
         name: parsedUrl.searchParams.get("name")!,
         image: parsedUrl.searchParams.get("image")!
       }
-
-      console.log("Айди юзера:", user);
+      
       if (mainWindow) {
+
         mainWindow.webContents.send("deep-link", user);
-        // localStorageUser.setItem("userData", JSON.stringify(user));
+        
         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "document"});
+        
         mainWindow.isFocused();
       }
     }
@@ -84,14 +86,7 @@ app.on("open-url", (event, url) => {
   }
   if(mainWindow){
     mainWindow.webContents.send("deep-link", user);
-    // localStorageUser.setItem("userData", JSON.stringify(user));
     mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "document"});
-    mainWindow.isFocused();
-    //Сделать метод для отправки данных из локального хранилища данных
-    // mainWindow.webContents.on("getStorageUserData", () => {
-    //   const user = localStorageUser.getItem("userData");
-    //   return user;
-    // })
-    
+    mainWindow.isFocused();    
   }  
 });

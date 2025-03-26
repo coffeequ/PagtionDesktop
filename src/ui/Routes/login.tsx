@@ -1,9 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { redirect } from "react-router-dom";
 
 export default function login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState(false);
+
+
+  useEffect(() => {
+    //@ts-ignore
+    window.electronAPI.syncDeepLinkGoogle((event, data) => {
+        console.log("полученный диплинк из document page", data);
+        window.localStorage.setItem("user", JSON.stringify(data));
+        redirect("/document");
+   })
+ }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,10 +32,14 @@ export default function login() {
         setStatus(true);
 
         const result = await response.json();
+
+        window.localStorage.setItem("user", JSON.stringify(result));
         
         console.log(result);
-        
-        return result;
+
+        redirect("/document");
+
+        return;
         
       } else {
         setStatus(false);

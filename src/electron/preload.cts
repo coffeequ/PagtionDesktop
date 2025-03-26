@@ -6,8 +6,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
    },
    syncDeepLinkGoogle: (callback: any) => {
       ipcRenderer.on("deep-link", callback);
-   },
-   getStorageUser: () => {
    }
 });
+
+
 
