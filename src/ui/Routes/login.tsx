@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState(false);
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -12,7 +13,7 @@ export default function login() {
     window.electronAPI.syncDeepLinkGoogle((event, data) => {
         console.log("полученный диплинк из document page", data);
         window.localStorage.setItem("user", JSON.stringify(data));
-        redirect("/document");
+        navigate("/document");
    })
  }, [])
 
@@ -31,16 +32,13 @@ export default function login() {
       if (response.ok) {
         setStatus(true);
 
-        const result = await response.json();
-
-        window.localStorage.setItem("user", JSON.stringify(result));
+        response.json().then((item) => {
+          window.localStorage.setItem("user", JSON.stringify(item));
+          navigate("/document");
+        });
         
-        console.log(result);
-
-        redirect("/document");
-
         return;
-        
+
       } else {
         setStatus(false);
         return;
@@ -66,15 +64,15 @@ export default function login() {
         <br />
         <button type="submit">Авторизироваться</button>
       </form>
-      { status ? (
-        <p >Успешный вход!</p>
-      ) : (
-        <p>Ошибка авторизации!</p>
-      ) }
       <button onClick={() => {
         //@ts-ignore
         window.electronAPI.handleOpenGoogleProvirder();
       }}>Войти с помощью google</button>
+      { status ? (
+        <p className="bg-emerald-600">Успешный вход!</p>
+      ) : (
+        <p className="bg-red-400">Ошибка авторизации!</p>
+      ) }
     </div>
   )
 }
