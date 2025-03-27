@@ -1,5 +1,7 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../components/ui/button";
 
 export default function login() {
   const [email, setEmail] = useState('');
@@ -62,12 +64,13 @@ export default function login() {
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </label>
         <br />
-        <button type="submit">Авторизироваться</button>
+        <Button variant="ghost" type="submit">Авторизироваться</Button>
       </form>
-      <button onClick={() => {
+      <Button variant="outline" onClick={() => {
         //@ts-ignore
         window.electronAPI.handleOpenGoogleProvirder();
-      }}>Войти с помощью google</button>
+      }}>Войти с помощью google</Button>
+
       { status ? (
         <p className="bg-emerald-600">Успешный вход!</p>
       ) : (
