@@ -1,5 +1,6 @@
 import { app, BrowserWindow, shell, ipcMain, nativeTheme } from 'electron';
 import path from 'path';
+import { startServer } from './server.js';
 
 interface IUser {
   id: string,
@@ -41,8 +42,8 @@ function createMainWindow(){
   });
 }
 
-
 app.whenReady().then(() => {
+  startServer();
   createMainWindow();
 });
 

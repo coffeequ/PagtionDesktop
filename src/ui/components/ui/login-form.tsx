@@ -38,6 +38,7 @@ export default function LoginForm(){
         setSuccess("");
         const email = values.email;
         const password = values.password;
+
         try {
             const response = await fetch('http://localhost:3000/api/authenticate', {
                     method: 'POST',
