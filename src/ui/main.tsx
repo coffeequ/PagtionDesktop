@@ -5,15 +5,18 @@ import './index.css'
 import App from './App.tsx'
 import Login from './Routes/login.tsx'
 import DocumentPage from './Routes/document.tsx'
+import { ThemeProvider } from './providers/theme-providers.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <HashRouter>
-      <Routes>
-        <Route path='/' element={<App/>}></Route>
-        <Route path='/login' element={<Login/>}></Route>
-        <Route path='/document' element={<DocumentPage/>}></Route>
-      </Routes>
-    </HashRouter>
-  </StrictMode>
+  <ThemeProvider>
+    <StrictMode>
+      <HashRouter>
+        <Routes>
+          <Route path='/' element={<App/>}></Route>
+          <Route path='/login' element={<Login/>}></Route>
+          <Route path='/document' element={<DocumentPage/>}></Route>
+        </Routes>
+      </HashRouter>
+    </StrictMode>
+  </ThemeProvider>
 )

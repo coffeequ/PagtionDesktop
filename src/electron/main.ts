@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, nativeTheme } from 'electron';
 import path from 'path';
 
 interface IUser {
@@ -23,10 +23,24 @@ function createMainWindow(){
 
   mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "login"});
 
+  ipcMain.handle('dark-mode:toggle', () => {
+    if (nativeTheme.shouldUseDarkColors) {
+      nativeTheme.themeSource = 'light'
+    } else {
+      nativeTheme.themeSource = 'dark'
+    }
+    return nativeTheme.shouldUseDarkColors
+  });
+
+  ipcMain.handle('dark-mode:system', () => {
+    nativeTheme.themeSource = 'system'
+  });
+
   mainWindow.on("closed", () => {
-      mainWindow.close(); 
+    mainWindow.close(); 
   });
 }
+
 
 app.whenReady().then(() => {
   createMainWindow();
@@ -38,8 +52,8 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-ipcMain.handle("openGoogleAuth", () => {
-  shell.openExternal('http://localhost:3000/electronRedirectOauth');
+ipcMain.handle("openGoogleAuth", (event, provider: string) => {
+  shell.openExternal(`http://localhost:3000/electronRedirectOauth?selectProviders=${provider}`);
 })
 
 //Для работы на windows 
