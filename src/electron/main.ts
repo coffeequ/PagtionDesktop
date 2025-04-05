@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell, ipcMain, nativeTheme } from 'electron';
 import path from 'path';
-import { startServer } from './server.js';
+import { DirectoryNotes } from './classes/DirectoryNotes.js';
+import { Note } from './classes/Note.js';
 
 interface IUser {
   id: string,
@@ -8,12 +9,13 @@ interface IUser {
   name: string,
   image: string | null
 }
-
 //Remind: В продакшене использовать две .., в дев .
 let mainWindow: BrowserWindow;
 
-function createMainWindow(){
+let directoryNotes = new DirectoryNotes();
 
+//Главное окно приложения
+function createMainWindow(){
   mainWindow = new BrowserWindow({
       width: 800,
       height: 600,
@@ -23,41 +25,51 @@ function createMainWindow(){
   });
 
   mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "login"});
+  
 
-  ipcMain.handle('dark-mode:toggle', () => {
-    if (nativeTheme.shouldUseDarkColors) {
-      nativeTheme.themeSource = 'light'
-    } else {
-      nativeTheme.themeSource = 'dark'
-    }
-    return nativeTheme.shouldUseDarkColors
-  });
-
-  ipcMain.handle('dark-mode:system', () => {
-    nativeTheme.themeSource = 'system'
-  });
 
   mainWindow.on("closed", () => {
     mainWindow.close(); 
   });
 }
 
-app.whenReady().then(() => {
-  startServer();
+//Создание окна при полной загрузки приложения
+app.whenReady().then(async () => {
+  directoryNotes.readNotesDirectory();
   createMainWindow();
 });
 
+//Создание кастомного протокола на macOS
 app.setAsDefaultProtocolClient("myapp");
 
+//Завершение работы приложение
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-ipcMain.handle("openGoogleAuth", (event, provider: string) => {
+//Открытие аутентификации в браузере
+ipcMain.handle("openAuth", (event, provider: string) => {
   shell.openExternal(`http://localhost:3000/electronRedirectOauth?selectProviders=${provider}`);
 })
 
-//Для работы на windows 
+//Смена темы
+ipcMain.handle('dark-mode:light', () => {
+  nativeTheme.themeSource = "light"
+});
+
+ipcMain.handle('dark-mode:dark', () => {
+  nativeTheme.themeSource = "light"
+});
+
+ipcMain.handle('dark-mode:system', () => {
+  nativeTheme.themeSource = 'system'
+});
+
+ipcMain.handle("current-theme", () => {
+  return nativeTheme.themeSource;
+});
+
+//Не допускать открытие нового окна и передача данные из окна браузера
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
@@ -87,8 +99,7 @@ if (!gotTheLock) {
     }
   });
 }
-
-//Для работы на macOS
+//Получение глубокой ссылки с macOS
 app.on("open-url", (event, url) => {
   event.preventDefault();
   console.log("Получен deep link:", url);
@@ -105,3 +116,54 @@ app.on("open-url", (event, url) => {
     mainWindow.isFocused();    
   }  
 });
+
+ipcMain.handle("read-notes", async () => {
+  await directoryNotes.readNotesDirectory()
+  return directoryNotes.notes;
+});
+
+
+ipcMain.handle("create-notes", async (event, title: string, userId: string, parentDocumentId?: string) => {
+  const note = new Note(title, userId, parentDocumentId);
+  const newNote = directoryNotes.createNotesDirectory(note);
+  return newNote;
+});
+
+ipcMain.handle("edit-notes", async (event, note : Note) => {
+  await directoryNotes.editNoteDirectory(note);
+  return directoryNotes.notes;
+});
+
+
+ipcMain.handle("delete-notes", async (event, noteId : string) => {
+  await directoryNotes.deleteNoteDirectory(noteId);
+  return directoryNotes.notes;
+});
+
+ipcMain.handle("get-all-notes", async (event) => {
+  return directoryNotes.notes;
+});
+
+ipcMain.handle("restore-notes", async (event, noteId: string) => {
+  return directoryNotes.recursiveRestoreNote(noteId);
+})
+
+ipcMain.handle("sidebar-notes", async (event, userId: string, parentDocumentId?: string) => {
+  return directoryNotes.sidebar(userId, parentDocumentId);
+})
+
+ipcMain.handle("archived-notes", async (event, noteId: string) => {
+  return directoryNotes.recursiveArchivedNote(noteId);
+})
+
+ipcMain.handle("getId-notes", async (event, noteId: string) => {
+  return await directoryNotes.getIdNotes(noteId);
+})
+
+ipcMain.handle("update-notes", async (event, noteId: string, isPublished?: boolean, userId?: string, title?: string, content?: string, coverImage?: string, icon?: string) => {
+  return directoryNotes.updateNotes(noteId, isPublished, userId, title, content, coverImage, icon);
+})
+
+ipcMain.handle("trash-notes", async (event, noteId: string) => {
+  return directoryNotes.trashNote(noteId);
+})

@@ -1,7 +1,11 @@
 {
     "appId": "com.pagtion.vercel",
-    "files": ["dist-electron", "dist-react"],
-    "extraResources": ["dist-electron/preload.cjs"],
+    "files": ["dist-electron", "dist-react", "prisma"],
+    "extraResources": [
+        "dist-electron/preload.cjs",
+        "dist-electron/server.js",
+        "prisma/database.db"
+    ],
     "protocols":{
         "name": "Ammm",
         "schemes": ["ammm"]
