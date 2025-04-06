@@ -2,6 +2,7 @@ import { app, BrowserWindow, shell, ipcMain, nativeTheme } from 'electron';
 import path from 'path';
 import { DirectoryNotes } from './classes/DirectoryNotes.js';
 import { Note } from './classes/Note.js';
+import { IUpdateProps } from './interfaces/IUpdateNote.js';
 
 interface IUser {
   id: string,
@@ -158,8 +159,8 @@ ipcMain.handle("getId-notes", async (event, noteId: string) => {
   return await directoryNotes.getIdNotes(noteId);
 })
 
-ipcMain.handle("update-notes", async (event, noteId: string, isPublished?: boolean, userId?: string, title?: string, content?: string, coverImage?: string, icon?: string) => {
-  return directoryNotes.updateNotes(noteId, isPublished, userId, title, content, icon);
+ipcMain.handle("update-notes", async (event, NoteUpdate: IUpdateProps) => {
+  return directoryNotes.updateNotes({...NoteUpdate});
 })
 
 ipcMain.handle("trash-notes", async (event, noteId: string) => {

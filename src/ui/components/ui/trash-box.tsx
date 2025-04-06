@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
-//import useRefreshStore from "@/hooks/use-refresh";
+import useRefreshStore from "@/hooks/use-refresh";
 
 interface IUser {
     id: string,
@@ -31,7 +31,7 @@ export default function TrashBox(){
 
     const [documents, setDocuments] = useState<INote[]>([]);
 
-    //const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
+    const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
 
     const [updateTrash, setUpdateTrash] = useState(false);
 
@@ -64,7 +64,7 @@ export default function TrashBox(){
             success: "Заметка была успешно восстановлена!",
             error: "Ошибка восставновление заметки"
         });
-        //triggerRefresh();
+        triggerRefresh();
         setUpdateTrash((prev) => !prev);
     }
 

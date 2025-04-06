@@ -19,10 +19,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.invoke("read-notes");
    },
    editNotes: (note: any) => {
-      return ipcRenderer.invoke("create-notes", note);
+      return ipcRenderer.invoke("edit-notes", note);
    },
    deleteNotes: (noteId: string) => {
-      return ipcRenderer.invoke("create-notes", noteId);
+      return ipcRenderer.invoke("delete-notes", noteId);
    },
    getAllNotes: () => {
       return ipcRenderer.invoke("get-all-notes");
@@ -39,8 +39,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
    idNote: (noteId: string) => {
       return ipcRenderer.invoke("getId-notes", noteId);
    },
-   updateNote: (noteId: string, isPublished: boolean, userId?: string, title?: string, content?: string, coverImage?: string, icon?: string) => {
-      return ipcRenderer.invoke("update-notes", noteId, isPublished, userId, title, content, coverImage, icon);
+   updateNote: (NoteUpdate: any) => {
+      return ipcRenderer.invoke("update-notes", NoteUpdate);
    },
    trashNote: (userId: string) => {
       return ipcRenderer.invoke("trash-notes", userId);

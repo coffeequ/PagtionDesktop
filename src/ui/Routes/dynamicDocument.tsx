@@ -37,17 +37,13 @@ export default function DocumentIdPage(){
             title = "Untitled";
         }
         //@ts-ignore
-        window.electronAPI.updateNote(params.id as string,title);
+        window.electronAPI.updateNote({noteId: params.id as string, title});
         triggerRefresh();
     }, [params.id as string]);
 
-    const onChangeContent = useCallback((content: string) => {
+    const onChangeContent = useCallback(async (content: string) => {
         //@ts-ignore
-        const result = window.electronAPI.updateNote(params.id as string, content);
-
-        //@ts-ignore
-        window.electronAPI.editNotes(result);
-
+        await window.electronAPI.updateNote({noteId: params.id as string, content});
     }, [params.id as string])
 
     if(document === undefined){

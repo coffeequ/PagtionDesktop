@@ -13,15 +13,15 @@ export class Note{
 
     noteId: string;
 
-    content: string | undefined;
+    content: string | undefined = "";
 
-    title: string | undefined
+    title: string | undefined = "";
 
     isArchived: boolean = false;
 
-    parentDocumentId: string | undefined;
+    parentDocumentId: string | undefined = "";
 
-    icon: string | undefined
+    icon: string | undefined = ""
 
     isPublished: boolean | undefined = false;
 

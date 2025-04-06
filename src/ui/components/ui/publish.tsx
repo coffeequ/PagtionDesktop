@@ -33,7 +33,7 @@ export default function Publish({ initialData, refresh } : IPublishProps) {
         setIsSubmitting(true);
         
         //@ts-ignore
-        const promise = window.electronAPI.updateNote(initialData.id, true).finally(() => {
+        const promise = window.electronAPI.updateNote({noteId: initialData.id, isPublished: true}).finally(() => {
             setIsSubmitting(false);
             refresh();
         });
@@ -49,7 +49,7 @@ export default function Publish({ initialData, refresh } : IPublishProps) {
         setIsSubmitting(true);
         
         //@ts-ignore
-        const promise = window.electronAPI.updateNote(initialData.id, true).finally(() => {
+        const promise = window.electronAPI.updateNote({noteId: initialData.id, isPublished: false}).finally(() => {
             setIsSubmitting(false);
             refresh();
         });

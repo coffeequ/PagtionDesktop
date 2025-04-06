@@ -48,6 +48,7 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
 
     function onInput(value: string) {
         setValue(value);
+        console.log("value: ", value);
         debounceTitleChange(value);
     }
 
@@ -60,7 +61,7 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
 
     function onIconSelect(icon: string){
         //@ts-ignore
-        window.electronAPI.updateNote(initialData.noteId, icon).then((item) => setIcon(item.icon));
+        window.electronAPI.updateNote({noteId: initialData.noteId, icon}).then((item) => setIcon(item.icon));
         triggerRefresh();
     }
 

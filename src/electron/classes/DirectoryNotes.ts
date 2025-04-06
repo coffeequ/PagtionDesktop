@@ -1,7 +1,8 @@
 import { app } from "electron";
 import { existsSync, mkdirSync, promises, readFile, unlink, writeFile } from "fs";
-import path, { resolve } from "path";
+import path from "path";
 import { Note } from "./Note.js";
+import { IUpdateProps } from "../interfaces/IUpdateNote.js";
 
 export class DirectoryNotes{
     
@@ -76,6 +77,7 @@ export class DirectoryNotes{
           }
           else {
             const indexDelete = this.notes.findIndex((item) => item.noteId === noteId);
+            console.log(indexDelete);
             const result = this.notes.splice(indexDelete, 1);
             resolve(result);
           }
@@ -149,16 +151,17 @@ export class DirectoryNotes{
       return note;
     }
 
-    async updateNotes(noteId: string, isPublished?: boolean, userId?: string, title?: string, content?: string, icon?: string){
+    async updateNotes({ noteId, title, content, icon, isPublished }: IUpdateProps){
       this.notes.forEach((item) => {
         if(item.noteId === noteId){
           item.title = title;
           item.content = content;
           item.icon = icon;
           item.isPublished = isPublished;
+          this.editNoteDirectory(item);
         }
       });
-      return this.notes;
+      
     }
 
     async trashNote(userId: string){
