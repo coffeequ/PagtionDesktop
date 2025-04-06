@@ -52,7 +52,7 @@ export default function LoginForm(){
             if(response.ok) {
                 response.json().then((item) => {
                 window.localStorage.setItem("user", JSON.stringify(item));
-                navigate("/document");});
+                navigate("/document/startPage");});
                 setSuccess("Авторизация прошла успешно!");
             return;
           } else {

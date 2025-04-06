@@ -58,6 +58,7 @@ export class DirectoryNotes{
             console.error(err);
             reject(err);
           } else {
+            console.log("createNote: ", note);
             this.notes.push(note);
             resolve(note);
           }
@@ -125,15 +126,17 @@ export class DirectoryNotes{
       }) 
     }
     
-    async sidebar(userId: string, parentDocumentId?: string){
-      const result: Note[] = [];
-      this.notes.forEach((item) => {
-        if(item.parentDocumentId === parentDocumentId && item.isArchived === false && item.userId === userId){
-          result.push(item);
+    async sidebar(userId: string, parentDocumentId: string){
+      const resultArr = [];
+      console.log("arr: ", this.notes);
+      for (let i = 0; i < this.notes.length; i++) {
+        console.log("this notes: ", this.notes[i]);
+        console.log("isArchived: ", this.notes[i], "userId: ", this.notes[i].userId, "parentDocumentId: ", this.notes[i].parentDocumentId);
+        if(this.notes[i].isArchived === false && this.notes[i].userId === userId && (this.notes[i].parentDocumentId === parentDocumentId || this.notes[i].parentDocumentId === null)){
+          resultArr.push(this.notes[i]);
         }
-      });
-      console.log(result);
-      return result;
+      }
+      return resultArr;
     }
 
     async getIdNotes(noteId: string){
@@ -146,12 +149,11 @@ export class DirectoryNotes{
       return note;
     }
 
-    async updateNotes(noteId: string, isPublished?: boolean, userId?: string, title?: string, content?: string, coverImage?: string, icon?: string){
+    async updateNotes(noteId: string, isPublished?: boolean, userId?: string, title?: string, content?: string, icon?: string){
       this.notes.forEach((item) => {
         if(item.noteId === noteId){
           item.title = title;
           item.content = content;
-          item.coverImage = coverImage;
           item.icon = icon;
           item.isPublished = isPublished;
         }

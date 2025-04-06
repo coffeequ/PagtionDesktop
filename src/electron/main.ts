@@ -25,8 +25,6 @@ function createMainWindow(){
   });
 
   mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "login"});
-  
-
 
   mainWindow.on("closed", () => {
     mainWindow.close(); 
@@ -148,7 +146,7 @@ ipcMain.handle("restore-notes", async (event, noteId: string) => {
   return directoryNotes.recursiveRestoreNote(noteId);
 })
 
-ipcMain.handle("sidebar-notes", async (event, userId: string, parentDocumentId?: string) => {
+ipcMain.handle("sidebar-notes", async (event, userId: string, parentDocumentId: string) => {
   return directoryNotes.sidebar(userId, parentDocumentId);
 })
 
@@ -161,7 +159,7 @@ ipcMain.handle("getId-notes", async (event, noteId: string) => {
 })
 
 ipcMain.handle("update-notes", async (event, noteId: string, isPublished?: boolean, userId?: string, title?: string, content?: string, coverImage?: string, icon?: string) => {
-  return directoryNotes.updateNotes(noteId, isPublished, userId, title, content, coverImage, icon);
+  return directoryNotes.updateNotes(noteId, isPublished, userId, title, content, icon);
 })
 
 ipcMain.handle("trash-notes", async (event, noteId: string) => {

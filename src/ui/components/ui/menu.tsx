@@ -31,7 +31,7 @@ export default function Menu({documentId} : IMenuProps) {
             error: "Перемещение не удалось."
         })
 
-        navigate("/documents");
+        navigate("/document/startPage");
     }
 
     return(

@@ -15,13 +15,13 @@ export default function Title({initialData}: TitleProps){
 
     const inputRef = useRef<HTMLInputElement>(null); 
 
-    const [title, setTitle] = useState(initialData._title || "Untitled");
+    const [title, setTitle] = useState(initialData.title || "Untitled");
 
     const [isEditing, setIsEditing] = useState(false);
 
 
     function enableInput(){
-        setTitle(initialData._title);
+        setTitle(initialData.title);
         setIsEditing(true);
         setTimeout(() => {
             inputRef.current?.focus();
@@ -48,8 +48,8 @@ export default function Title({initialData}: TitleProps){
     return(
         <div className="flex items-center gap-x-1">
             {
-                !!initialData._icon && (
-                    <p>{initialData._icon}</p>
+                !!initialData.icon && (
+                    <p>{initialData.icon}</p>
                 )
             }
             {
@@ -58,7 +58,7 @@ export default function Title({initialData}: TitleProps){
                 ): (
                     <Button onClick={enableInput} variant="ghost" className="font-normal h-auto p-1">
                         <span className="truncate">
-                            {initialData?._title}
+                            {initialData?.title}
                         </span> 
                     </Button>
                 )

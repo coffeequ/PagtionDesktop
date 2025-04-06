@@ -29,7 +29,7 @@ export default function Banner({documentId}: IBannerProps){
             error: "Произошла ошибка при удалении."
         });
 
-        navigate("/documents");
+        navigate("/document/startPage");
     }
 
     function onRestore(){
@@ -46,7 +46,7 @@ export default function Banner({documentId}: IBannerProps){
 
         triggerRefresh();
         
-        navigate("/documents");
+        navigate("/document/startPage");
     }
 
     return(

@@ -16,6 +16,7 @@ import Navbar from "./navbar.tsx";
 import useRefreshStore from "@/hooks/use-refresh";
 import { useNavigate, useParams } from "react-router-dom";
 import { GetUser } from "@/actions/user.ts";
+import { INote } from "@/interfaces/INote.ts";
 
 export default function Navigation(){
 
@@ -117,12 +118,13 @@ export default function Navigation(){
             throw new Error("Не найден id пользователя");
         }
         //@ts-ignore
-        const promise = window.electronAPI.createNote("Untitled", user.id).then((item) => {
-            navigate(`/documents/${item.noteId}`);
+        const newNote = window.electronAPI.createNote("Untitled", user.id, undefined).then((item) => {
+            const result: INote = item
             triggerRefresh();
+            navigate(`/document/${result.noteId}`);
         });
 
-        toast.promise(promise, {
+        toast.promise(newNote, {
             loading: "Создание новой заметки...",
             success: "Заметка успешно создана!",
             error: "Произошла ошибка при создании заметки"

@@ -45,11 +45,11 @@ export default function TrashBox(){
     }, [updateTrash]);
 
     const filtredDocuments = documents.filter((document: INote) => {
-        return document._title.toLowerCase().includes(search.toLowerCase());
+        return document.title.toLowerCase().includes(search.toLowerCase());
     });
 
     function onClick(documentId: string){
-        navigate(`/documents/${documentId}`);
+        navigate(`/document/${documentId}`);
     }
 
     function onRestore(event: React.MouseEvent<HTMLDivElement, MouseEvent>, documentId: string){
@@ -80,7 +80,7 @@ export default function TrashBox(){
         });
         setUpdateTrash((prev) => !prev);
         if(params.documentId === documentId){
-            navigate("/document")
+            navigate("/document/startPage")
         }
     }
 
@@ -103,15 +103,15 @@ export default function TrashBox(){
                     Страницы не были найдены
                 </p>
                 {filtredDocuments?.map((document: INote) => (
-                    <div key={document._noteId} role = "button" onClick={() => onClick(document._noteId)} className="text-sm rounded-sm w-full hover:bg-primary/5 flex items-center text-primary justify-between">
+                    <div key={document.noteId} role = "button" onClick={() => onClick(document.noteId)} className="text-sm rounded-sm w-full hover:bg-primary/5 flex items-center text-primary justify-between">
                         <span className="truncate pl-2">
-                            {document._title}
+                            {document.title}
                         </span>
                         <div className="flex items-center">
-                            <div onClick={(e) => onRestore(e, document._noteId)} role="button" className="rounded-sm p-2 hover:bg-neutral-200 dark:hover:bg-neutral-600">
+                            <div onClick={(e) => onRestore(e, document.noteId)} role="button" className="rounded-sm p-2 hover:bg-neutral-200 dark:hover:bg-neutral-600">
                                 <Undo className="w-4 h-4 text-muted-foreground"/>
                             </div>
-                            <ConfirmModal onConfirm={() => onRemove(document._noteId)}>
+                            <ConfirmModal onConfirm={() => onRemove(document.noteId)}>
                                 <div role="button" className="rounded-sm p-2 hover:bg-neutral-200 dark:hover:bg-neutral-600">
                                     <Trash className="h-4 w-4 text-muted-foreground"/>
                                 </div>

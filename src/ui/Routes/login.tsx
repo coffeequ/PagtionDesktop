@@ -12,7 +12,7 @@ export default function login() {
     const user = GetUser();
     console.log(user);
     if(user){
-      navigate("/document");
+      navigate("/document/startPage");
     }
   }, [])
   

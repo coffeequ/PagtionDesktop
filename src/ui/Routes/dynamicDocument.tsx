@@ -24,7 +24,6 @@ export default function DocumentIdPage(){
             if(!user.id){
                 throw new Error("Не найден id пользователя");
             };
-            console.log(params.id);
             //@ts-ignore
             const document = await window.electronAPI.idNote(params.id);
             console.log("document: ", document);
@@ -72,7 +71,7 @@ export default function DocumentIdPage(){
             <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
                 <Toolbar initialData = { document } onTitleChange={onChangeTitle} />
                 <Suspense fallback={<Spinner/>}>
-                    <Editor onChange={onChangeContent} initialContent={document._content} />
+                    <Editor onChange={onChangeContent} initialContent={document.content} />
                 </Suspense>
             </div>
         </div> 

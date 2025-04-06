@@ -16,7 +16,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
       return ipcRenderer.invoke("create-notes", title, userId, parentDocumentId);
    },
    readNotes: () => {
-      return ipcRenderer.invoke("read-notes");
+      ipcRenderer.invoke("read-notes");
    },
    editNotes: (note: any) => {
       return ipcRenderer.invoke("create-notes", note);
@@ -30,7 +30,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
    restore: (noteId: string) => {
       return ipcRenderer.invoke("restore-notes", noteId);
    },
-   sidebar: (userId: string, parentDocumentId?: string) => {
+   sidebar: (userId: string, parentDocumentId: string) => {
       return ipcRenderer.invoke("sidebar-notes", userId, parentDocumentId);
    },
    archived: (noteId: string) => {

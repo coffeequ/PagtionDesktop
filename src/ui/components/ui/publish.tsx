@@ -26,7 +26,7 @@ export default function Publish({ initialData, refresh } : IPublishProps) {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const url = `${origin}/preview/${initialData._noteId}`;
+    const url = `${origin}/preview/${initialData.noteId}`;
 
     function onPublished() {
 
@@ -76,7 +76,7 @@ export default function Publish({ initialData, refresh } : IPublishProps) {
                 <Button variant="ghost">
                     Поделиться
                     {
-                        initialData._isPublished && (
+                        initialData.isPublished && (
                             <Globe className="text-sky-500 w-4 h-4 ml-2" />
                         )
                     }
@@ -84,7 +84,7 @@ export default function Publish({ initialData, refresh } : IPublishProps) {
             </PopoverTrigger>
             <PopoverContent className="w-72" align="end" alignOffset={8} forceMount >
                     {
-                        initialData._isPublished ? (
+                        initialData.isPublished ? (
                             <div className="space-y-4">
                                 <div className="flex items-center gap-x-2">
                                     <Globe className="text-sky-500 animate-pulse h-4 w-4" />

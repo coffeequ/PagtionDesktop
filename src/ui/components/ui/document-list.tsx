@@ -36,11 +36,12 @@ export default function DocumentList({ parentDocumentId, level = 0} : DocumentLi
     }
 
     const fetchDocuments = async () => {
+        console.log(parentDocumentId);
         if(!user){
             throw new Error("Пользователь не был найден!");
         }
         //@ts-ignore
-        const data: INote[] = await window.electronAPI.sidebar(user.id, parentDocumentId);
+        const data = await window.electronAPI.sidebar(user.id, parentDocumentId);
         setDocuments(data);
     }
 
@@ -53,7 +54,7 @@ export default function DocumentList({ parentDocumentId, level = 0} : DocumentLi
     } 
 
     function onRedirect(documentId: string){
-        navigate(`/documents/${documentId}`);
+        navigate(`/document/${documentId}`);
     }
 
     if (documents === undefined){
@@ -81,23 +82,23 @@ export default function DocumentList({ parentDocumentId, level = 0} : DocumentLi
                 Нет вложенных страниц
             </p>
             {documents.map((document) => (
-                <div key={document._noteId}>
-                        <Item id={document._noteId}
-                        onClick={() => onRedirect(document._noteId)}
-                        label = {document._noteId}
+                <div key={document.noteId}>
+                        <Item id={document.noteId}
+                        onClick={() => onRedirect(document.noteId)}
+                        label = {document.title}
                         icon = {FileIcon}
-                        documentIcon={document._noteId!}
-                        active = {params.documentId === document._noteId}
+                        documentIcon={document.icon}
+                        active = {params.documentId === document.noteId}
                         level = {level}
-                        onExpand={() => onExpand(document._noteId)}
-                        expanded = {expanded[document._noteId]}
+                        onExpand={() => onExpand(document.noteId)}
+                        expanded = {expanded[document.noteId]}
                         refreshDocuments={refreshDocuments}
                         />
                         {
                             
-                            expanded[document._noteId as string] && (
+                            expanded[document.noteId as string] && (
                                 <DocumentList
-                                    parentDocumentId={document._noteId}
+                                    parentDocumentId={document.noteId}
                                     level={level + 1}
                                 />
                             )

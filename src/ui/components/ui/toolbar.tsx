@@ -2,11 +2,10 @@
 
 import IconPicker from "./icon-picker";
 import { Button } from "@/components/ui/button";
-import { ImageIcon, Smile, X } from "lucide-react";
+import { Smile, X } from "lucide-react";
 import { ComponentRef, useRef, useState } from "react";
 
 import TextareaAutosize from "react-textarea-autosize"
-import { useCoverImage } from "@/hooks/use-cover-image";
 
 import { useDebounceCallback } from "usehooks-ts";
 import useRefreshStore from "@/hooks/use-refresh";
@@ -22,17 +21,16 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
 
     const inputRef = useRef<ComponentRef<"textarea">>(null);
 
-    const [icon, setIcon] = useState(initialData._icon);
+    const [icon, setIcon] = useState(initialData.icon);
 
     const [isEditing, setIsEditing] = useState(false);
 
-    const [value, setValue] = useState(initialData._title);
+    const [value, setValue] = useState(initialData.title);
 
     const debounceTitleChange = useDebounceCallback(onTitleChange, 200);
 
     const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
 
-    const coverImage = useCoverImage();
 
     function enableInput() {
         if(preview) return;
@@ -69,7 +67,7 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
     function onIconRemove(){
         //@ts-ignore
         window.electronAPI.idNote(initialData.noteId).then((item: INote) =>{
-            item._icon = "";
+            item.icon = "";
             setIcon("");
         });
         triggerRefresh();
@@ -107,15 +105,6 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
                                 Добавить иконку
                             </Button>
                         </IconPicker>
-                    )
-                }
-                {
-                    
-                    !coverImage.url && !preview && (
-                        <Button onClick={coverImage.onOpen} className="text-muted-foreground text-xs" variant="outline" size="sm">
-                            <ImageIcon className="h-4 w-4 mr-2"/>
-                            Добавить обложку
-                        </Button>
                     )
                 }
             </div>

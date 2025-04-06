@@ -8,6 +8,7 @@ import DocumentPage from './Routes/document.tsx'
 import { ThemeProvider } from './providers/theme-providers.tsx'
 import { Toaster } from 'sonner'
 import DocumentPageDynamic from './Routes/dynamicDocument.tsx'
+import StartDocumentPage from './Routes/startDocument.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <ThemeProvider>
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path='/' element={<App/>}></Route>
           <Route path='/login' element={<Login/>}></Route>
           <Route path='/document' element={<DocumentPage/>}>
+            <Route index path='/document/startPage' element={<StartDocumentPage/>}></Route>
             <Route path='/document/:id' element={<DocumentPageDynamic/>}></Route>
           </Route>
         </Routes>

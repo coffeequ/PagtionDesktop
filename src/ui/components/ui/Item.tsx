@@ -44,7 +44,7 @@ export default function Item( {id, label, onClick, icon:Icon, active, expanded, 
         if(!id || !user.id) return;
         //@ts-ignore
         const promise = window.electronAPI.archived(id, user.id).then(() => {
-            navigate(`/documents`);
+            navigate(`/document/startPage`);
             refreshDocuments?.();
         });
         toast.promise(promise, {
@@ -71,7 +71,7 @@ export default function Item( {id, label, onClick, icon:Icon, active, expanded, 
                 else{
                     shouldRefresh();
                 }
-            navigate(`/documents/${document._noteId}`);
+            navigate(`/document/${document.noteId}`);
         });
 
         toast.promise(promise, {
