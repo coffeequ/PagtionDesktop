@@ -2,7 +2,7 @@
 
 import IconPicker from "./icon-picker";
 import { Button } from "@/components/ui/button";
-import { Smile, X } from "lucide-react";
+import { X } from "lucide-react";
 import { ComponentRef, useRef, useState } from "react";
 
 import TextareaAutosize from "react-textarea-autosize"
@@ -97,18 +97,6 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
                     </p>
                 )
             }
-            <div className="opacity-0 group-hover:opacity-100 flex items-center gap-x-1 py-4">
-                {
-                    !icon && !preview && (
-                        <IconPicker asChild onChange={onIconSelect}>
-                            <Button className="text-muted-foreground text-xs" variant="outline" size="sm">
-                                <Smile className="h-4 w-4 mr-2" />
-                                Добавить иконку
-                            </Button>
-                        </IconPicker>
-                    )
-                }
-            </div>
             {
                 isEditing && !preview ? (
                     <TextareaAutosize 

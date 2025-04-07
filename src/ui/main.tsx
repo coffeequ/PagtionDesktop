@@ -19,7 +19,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path='/' element={<App/>}></Route>
           <Route path='/login' element={<Login/>}></Route>
           <Route path='/document' element={<DocumentPage/>}>
-            <Route index path='/document/startPage' element={<StartDocumentPage/>}></Route>
+            <Route path='/document/startPage' element={<StartDocumentPage/>}></Route>
             <Route path='/document/:id' element={<DocumentPageDynamic/>}></Route>
           </Route>
         </Routes>

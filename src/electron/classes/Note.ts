@@ -20,9 +20,7 @@ export class Note{
     isArchived: boolean = false;
 
     parentDocumentId: string | undefined = "";
-
-    icon: string | undefined = ""
-
+    
     isPublished: boolean | undefined = false;
 
     creationTime : Number = Date.now();

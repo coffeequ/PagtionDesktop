@@ -151,12 +151,12 @@ export class DirectoryNotes{
       return note;
     }
 
-    async updateNotes({ noteId, title, content, icon, isPublished }: IUpdateProps){
-      this.notes.forEach((item) => {
+    async updateNotes({ noteId, title, content, isPublished }: IUpdateProps){
+      this.notes.find((item) => {
         if(item.noteId === noteId){
+          console.log(item);
           item.title = title;
           item.content = content;
-          item.icon = icon;
           item.isPublished = isPublished;
           this.editNoteDirectory(item);
         }

@@ -4,6 +4,5 @@ export interface IUpdateProps {
     title?: string,
     content?: string,
     coverImage?: string,
-    icon?: string,
     isPublished?: boolean   
 }
