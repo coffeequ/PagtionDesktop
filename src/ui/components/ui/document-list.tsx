@@ -85,7 +85,7 @@ export default function DocumentList({ parentDocumentId, level = 0} : DocumentLi
                 <div key={document.noteId}>
                         <Item id={document.noteId}
                         onClick={() => onRedirect(document.noteId)}
-                        label = {document.noteId}
+                        label = {document.title}
                         icon = {FileIcon}
                         active = {params.documentId === document.noteId}
                         level = {level}

@@ -8,7 +8,7 @@ import Spinner from "@/components/ui/spinner";
 
 export default function DocumentIdPage(){
 
-    const params = useParams();
+    const { id } = useParams();
 
     const Editor = useMemo(() => lazy(() => import('@/components/ui/editor')), []);
     
@@ -24,27 +24,27 @@ export default function DocumentIdPage(){
                 throw new Error("Не найден id пользователя");
             };
             //@ts-ignore
-            window.electronAPI.idNote(params.id).then((item) => {
-                console.log("item: ", item);
+            window.electronAPI.idNote(id).then((item) => {
+                //console.log("item: ", item);
                 setDocument(item);
             });
         }
         fetchDocument();
-    }, [params.id as string]);
+    }, [id as string]);
 
-    const onChangeTitle = useCallback((title: string) => {
+    const onChangeTitle = useCallback(async (title: string) => {
         if(title === ""){
             title = "Untitled";
         }
         //@ts-ignore
-        window.electronAPI.updateNote({noteId: params.id as string, title});
+        await window.electronAPI.updateNote({noteId: id as string, title, content: document?.content});
         triggerRefresh();
-    }, [params.id as string]);
+    }, [id as string]);
 
     const onChangeContent = useCallback(async (content: string) => {
         //@ts-ignore
-        await window.electronAPI.updateNote({noteId: params.id as string, content});
-    }, [params.id as string])
+        await window.electronAPI.updateNote({noteId: id as string, content, title: document?.title});
+    }, [id as string])
 
     if(document === undefined){
         return(
@@ -63,9 +63,9 @@ export default function DocumentIdPage(){
     }
     
     return(
-        <div className="pb-40 dark:bg-[#1F1F1F]">
+        <div className=" dark:bg-[#1F1F1F]">
             <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
-                <Toolbar initialData = { document } onTitleChange={onChangeTitle} />
+                <Toolbar key={ document.noteId } initialData = { document } onTitleChange={onChangeTitle} />
                 <Suspense fallback={<Spinner/>}>
                     <Editor key={ document.noteId } onChange={onChangeContent} initialContent={document.content} />
                 </Suspense>

@@ -44,6 +44,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
    },
    trashNote: (userId: string) => {
       return ipcRenderer.invoke("trash-notes", userId);
+   },
+   searchNote: (userId: string) => {
+      return ipcRenderer.invoke("search-note", userId);
    }
 });
 

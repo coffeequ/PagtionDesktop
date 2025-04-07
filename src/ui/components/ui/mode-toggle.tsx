@@ -27,21 +27,21 @@ export function ModeToggle() {
           //@ts-ignore
           window.electronAPI.toggleLight();
         }}>
-          Light
+          Светлая
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => {
             setTheme("dark");
             //@ts-ignore
             window.electronAPI.toggleDark();
         }}>
-          Dark
+          Темная
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => {
             setTheme("system");
             //@ts-ignore
             window.electronAPI.system();
         }}>
-          System
+          Системная
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

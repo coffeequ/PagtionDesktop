@@ -76,7 +76,7 @@ if (!gotTheLock) {
   app.on('second-instance', (event, argv, workingDirectory) => {
     const deepLink = argv.find(arg => arg.startsWith('myapp://'));
     if (deepLink) {
-      console.log("Получен deep link (в second-instance):", deepLink);
+      //console.log("Получен deep link (в second-instance):", deepLink);
 
       const parsedUrl = new URL(deepLink);
 
@@ -101,7 +101,7 @@ if (!gotTheLock) {
 //Получение глубокой ссылки с macOS
 app.on("open-url", (event, url) => {
   event.preventDefault();
-  console.log("Получен deep link:", url);
+  //console.log("Получен deep link:", url);
   const parsedUrl = new URL(url);
   const user: IUser = {
     id: parsedUrl.searchParams.get("id")!,
@@ -165,4 +165,8 @@ ipcMain.handle("update-notes", async (event, NoteUpdate: IUpdateProps) => {
 
 ipcMain.handle("trash-notes", async (event, noteId: string) => {
   return directoryNotes.trashNote(noteId);
+})
+
+ipcMain.handle("search-note", async(event, userId: string) => {
+  return directoryNotes.searchNote(userId);
 })

@@ -31,7 +31,6 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
 
     const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
 
-
     function enableInput() {
         if(preview) return;
         setIsEditing(true);
@@ -48,7 +47,6 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
 
     function onInput(value: string) {
         setValue(value);
-        console.log("value: ", value);
         debounceTitleChange(value);
     }
 
@@ -88,13 +86,6 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
                             </Button>
                         </IconPicker>
                     </div>
-                )
-            }
-            {
-                !!icon && preview && (
-                    <p className="text-6xl pt-6">
-                        {icon}
-                    </p>
                 )
             }
             {

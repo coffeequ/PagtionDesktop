@@ -35,11 +35,11 @@ export class DirectoryNotes{
     async readNotesDirectory(){
       if(!existsSync(this.folderPath)){
         mkdirSync(this.folderPath, { recursive: true });
-        console.log("Folder with notes is create: ", this.folderPath);
+        //console.log("Folder with notes is create: ", this.folderPath);
       }
-      else{
-        console.log("folder with notes exists: ", this.folderPath);
-      }
+      // else{
+      //   console.log("folder with notes exists: ", this.folderPath);
+      // }
 
       const files = await promises.readdir(this.folderPath);
       const promiseFiles = files.map(async (item) => {
@@ -59,7 +59,7 @@ export class DirectoryNotes{
             console.error(err);
             reject(err);
           } else {
-            console.log("createNote: ", note);
+            //console.log("createNote: ", note);
             this.notes.push(note);
             resolve(note);
           }
@@ -72,12 +72,12 @@ export class DirectoryNotes{
        return new Promise((resolve, rejects) => {
         unlink(`${this.folderPath}/${noteId}.json`, (err) => {
           if(err){
-            console.log(err);
+            //console.log(err);
             rejects(err);
           }
           else {
             const indexDelete = this.notes.findIndex((item) => item.noteId === noteId);
-            console.log(indexDelete);
+            //console.log(indexDelete);
             const result = this.notes.splice(indexDelete, 1);
             resolve(result);
           }
@@ -91,7 +91,7 @@ export class DirectoryNotes{
           this.notes.splice(indexDelete, 1);
           writeFile(`${this.folderPath}/${note.noteId}.json`, JSON.stringify(note), (err) => {
             if(err){
-              console.log(err);
+              //console.log(err);
               rejects(err);
             }
             else {
@@ -130,10 +130,10 @@ export class DirectoryNotes{
     
     async sidebar(userId: string, parentDocumentId: string){
       const resultArr = [];
-      console.log("arr: ", this.notes);
+      //console.log("arr: ", this.notes);
       for (let i = 0; i < this.notes.length; i++) {
-        console.log("this notes: ", this.notes[i]);
-        console.log("isArchived: ", this.notes[i], "userId: ", this.notes[i].userId, "parentDocumentId: ", this.notes[i].parentDocumentId);
+        //console.log("this notes: ", this.notes[i]);
+        //console.log("isArchived: ", this.notes[i], "userId: ", this.notes[i].userId, "parentDocumentId: ", this.notes[i].parentDocumentId);
         if(this.notes[i].isArchived === false && this.notes[i].userId === userId && (this.notes[i].parentDocumentId === parentDocumentId || this.notes[i].parentDocumentId === null)){
           resultArr.push(this.notes[i]);
         }
@@ -154,7 +154,7 @@ export class DirectoryNotes{
     async updateNotes({ noteId, title, content, isPublished }: IUpdateProps){
       this.notes.find((item) => {
         if(item.noteId === noteId){
-          console.log(item);
+          //console.log(item);
           item.title = title;
           item.content = content;
           item.isPublished = isPublished;
@@ -173,5 +173,15 @@ export class DirectoryNotes{
       })
 
       return trash;
+    }
+
+    async searchNote(userId: string){
+     const resultArr: Note[] = [];
+     for(let i = 0; i < this.notes.length; i++){
+      if(!this.notes[i].isArchived && this.notes[i].userId === userId){
+        resultArr.push(this.notes[i]);
+      }
+     }
+     return resultArr.filter((item) => item.title);
     }
 }
