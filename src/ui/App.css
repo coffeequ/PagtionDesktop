@@ -3,6 +3,16 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html, body, :root{
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

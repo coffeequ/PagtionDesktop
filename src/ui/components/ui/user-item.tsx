@@ -4,6 +4,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface IUser {
     id: string,
@@ -17,21 +18,14 @@ export default function UserItem(){
     const getUser = localStorage.getItem("user");
 
     const user: IUser = JSON.parse(getUser as string);
+    
+    const navigate = useNavigate();
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>
                 <div role="button" className="flex items-center text-sm p-3 w-full hover:bg-primary/5">
                     <div className="gap-x-2 flex items-center max-w-[150px]">
-                        <Avatar className="h-5 w-5">
-                            {
-                                !user.image ? (
-                                    <User/>
-                                ):(
-                                    <AvatarImage src={user.image} />
-                                )
-                            }
-                        </Avatar>
                         <span className="text-start font-medium line-clamp-1">
                             {user.name}
                         </span>
@@ -65,7 +59,13 @@ export default function UserItem(){
                 </div>
                 <DropdownMenuSeparator/>
                 <DropdownMenuItem asChild className="w-full cursor-pointer text-muted-foreground">
-                    <Button variant="ghost" onClick={() => {}}>
+                    <Button variant="ghost" onClick={() => {
+                        const user = localStorage.getItem("user");
+                        if(user){
+                            localStorage.removeItem("user");
+                            navigate("/login");
+                        }
+                    }}>
                         Выйти
                     </Button>
                 </DropdownMenuItem>

@@ -36,7 +36,6 @@ export default function DocumentList({ parentDocumentId, level = 0} : DocumentLi
     }
 
     const fetchDocuments = async () => {
-        console.log(parentDocumentId);
         if(!user){
             throw new Error("Пользователь не был найден!");
         }
