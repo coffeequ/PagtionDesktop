@@ -5,6 +5,7 @@ import{
 } from "@blocknote/core";
 import { useCreateBlockNote } from "@blocknote/react"
 import { BlockNoteView } from "@blocknote/mantine"
+
 import "@blocknote/mantine/style.css"
 
 import { useDebounceCallback } from "usehooks-ts";
@@ -19,8 +20,12 @@ interface IEditorProps{
 
 function Editor({ onChange, initialContent, editable } : IEditorProps){
     
+    let resolvedTheme;
+
     //@ts-ignore
-    const resolvedTheme  = window.electronAPI.currentTheme()
+    window.electronAPI.currentTheme().then((item) => {
+        resolvedTheme = item;
+    })
 
     const debouncedOnChange = useDebounceCallback(onChange, 200);
 
@@ -29,7 +34,7 @@ function Editor({ onChange, initialContent, editable } : IEditorProps){
     });
 
    useEffect(() => {
-    editor.onEditorContentChange(() => {debouncedOnChange(JSON.stringify(editor.document, null, 2))});
+    editor.onChange(() => {debouncedOnChange(JSON.stringify(editor.document, null, 2))});
    }, [debouncedOnChange, editor]);
     
     return(

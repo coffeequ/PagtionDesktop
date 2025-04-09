@@ -3,7 +3,6 @@ import path from 'path';
 import { DirectoryNotes } from './classes/DirectoryNotes.js';
 import { Note } from './classes/Note.js';
 import { IUpdateProps } from './interfaces/IUpdateNote.js';
-
 interface IUser {
   id: string,
   email: string,
@@ -30,6 +29,7 @@ function createMainWindow(){
   mainWindow.on("closed", () => {
     mainWindow.close(); 
   });
+  
 }
 
 //Создание окна при полной загрузки приложения
@@ -46,6 +46,14 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
+function GetCurrentTheme(theme: string): string{
+  let value = localStorage.getItem(theme);
+  if(value){
+    value = "system";
+  }
+  return value as string;
+}
+
 //Открытие аутентификации в браузере
 ipcMain.handle("openAuth", (event, provider: string) => {
   shell.openExternal(`http://localhost:3000/electronRedirectOauth?selectProviders=${provider}`);
@@ -57,7 +65,7 @@ ipcMain.handle('dark-mode:light', () => {
 });
 
 ipcMain.handle('dark-mode:dark', () => {
-  nativeTheme.themeSource = "light"
+  nativeTheme.themeSource = "dark"
 });
 
 ipcMain.handle('dark-mode:system', () => {
@@ -80,12 +88,16 @@ if (!gotTheLock) {
 
       const parsedUrl = new URL(deepLink);
 
+      console.log(parsedUrl);
+
       const user: IUser = {
         id: parsedUrl.searchParams.get("id")!,
         email: parsedUrl.searchParams.get("email")!,
         name: parsedUrl.searchParams.get("name")!,
         image: parsedUrl.searchParams.get("image")!
       }
+
+      console.log("полученный user: ");
       
       if (mainWindow) {
 

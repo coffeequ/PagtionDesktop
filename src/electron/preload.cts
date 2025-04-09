@@ -8,7 +8,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on("deep-link", callback);
    },
    toggleLight: () => ipcRenderer.invoke('dark-mode:light'),
-   toggleDark: () => ipcRenderer.invoke('dark-mode:light'),
+   toggleDark: () => ipcRenderer.invoke('dark-mode:dark'),
    system: () => ipcRenderer.invoke('dark-mode:system'),
    currentTheme: () => ipcRenderer.invoke("current-theme"),
    

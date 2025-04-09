@@ -52,8 +52,8 @@ export default function LoginForm(){
             if(response.ok) {
                 response.json().then((item) => {
                 window.localStorage.setItem("user", JSON.stringify(item));
-                navigate("/document/startPage");});
                 setSuccess("Авторизация прошла успешно!");
+                navigate("/document/startPage");});
             return;
           } else {
             setError("Произошла ошибка авторизации");

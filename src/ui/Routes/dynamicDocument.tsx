@@ -20,30 +20,36 @@ export default function DocumentIdPage(){
 
     useEffect(() => {
         async function fetchDocument(){
+            console.log("user-dynamicDocument: ", user);
             if(!user.id){
                 throw new Error("Не найден id пользователя");
             };
             //@ts-ignore
-            window.electronAPI.idNote(id).then((item) => {
+            await window.electronAPI.idNote(id).then((item) => {
                 //console.log("item: ", item);
                 setDocument(item);
             });
         }
         fetchDocument();
-    }, [id as string]);
+    }, [id as string,]);
 
+    //Смена наименования заметки
     const onChangeTitle = useCallback(async (title: string) => {
         if(title === ""){
             title = "Untitled";
         }
         //@ts-ignore
-        await window.electronAPI.updateNote({noteId: id as string, title, content: document?.content});
+        await window.electronAPI.updateNote({noteId: id as string, title});
+        console.log("title: ", {noteId: id as string, title, content: document?.content});
         triggerRefresh();
     }, [id as string]);
 
+    //Смена конента заметки
     const onChangeContent = useCallback(async (content: string) => {
         //@ts-ignore
-        await window.electronAPI.updateNote({noteId: id as string, content, title: document?.title});
+        await window.electronAPI.updateNote({noteId: id as string, content});
+        console.log("content: ", {noteId: id as string, content, title: document?.title});
+        triggerRefresh();
     }, [id as string])
 
     if(document === undefined){
@@ -63,7 +69,7 @@ export default function DocumentIdPage(){
     }
     
     return(
-        <div className=" dark:bg-[#1F1F1F]">
+        <div className="dark:bg-[#1F1F1F]">
             <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
                 <Toolbar key={ document.noteId } initialData = { document } onTitleChange={onChangeTitle} />
                 <Suspense fallback={<Spinner/>}>

@@ -1,14 +1,14 @@
 "use client"
 
-import IconPicker from "./icon-picker";
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+// import IconPicker from "./icon-picker";
+// import { Button } from "@/components/ui/button";
+// import { X } from "lucide-react";
 import { ComponentRef, useRef, useState } from "react";
 
 import TextareaAutosize from "react-textarea-autosize"
 
 import { useDebounceCallback } from "usehooks-ts";
-import useRefreshStore from "@/hooks/use-refresh";
+// import useRefreshStore from "@/hooks/use-refresh";
 import { INote } from "@/interfaces/INote";
 
 interface IToolbarProps {
@@ -21,7 +21,7 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
 
     const inputRef = useRef<ComponentRef<"textarea">>(null);
 
-    const [icon, setIcon] = useState(initialData.icon);
+    // const [icon, setIcon] = useState(initialData.icon);
 
     const [isEditing, setIsEditing] = useState(false);
 
@@ -29,7 +29,7 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
 
     const debounceTitleChange = useDebounceCallback(onTitleChange, 200);
 
-    const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
+    // const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
 
     function enableInput() {
         if(preview) return;
@@ -57,24 +57,24 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
         }
     }
 
-    function onIconSelect(icon: string){
-        //@ts-ignore
-        window.electronAPI.updateNote({noteId: initialData.noteId, icon}).then((item) => setIcon(item.icon));
-        triggerRefresh();
-    }
+    // function onIconSelect(icon: string){
+    //     //@ts-ignore
+    //     window.electronAPI.updateNote({noteId: initialData.noteId, icon}).then((item) => setIcon(item.icon));
+    //     triggerRefresh();
+    // }
 
-    function onIconRemove(){
-        //@ts-ignore
-        window.electronAPI.idNote(initialData.noteId).then((item: INote) =>{
-            item.icon = "";
-            setIcon("");
-        });
-        triggerRefresh();
-    }
+    // function onIconRemove(){
+    //     //@ts-ignore
+    //     window.electronAPI.idNote(initialData.noteId).then((item: INote) =>{
+    //         item.icon = "";
+    //         setIcon("");
+    //     });
+    //     triggerRefresh();
+    // }
 
     return(
         <div className="pl-[54px] group relative">
-            {
+            {/* {
                 !!icon && !preview && (
                     <div className="flex items-center gap-x-2 group/icon pt-6">
                         <IconPicker onChange={onIconSelect}>
@@ -87,7 +87,7 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
                         </IconPicker>
                     </div>
                 )
-            }
+            } */}
             {
                 isEditing && !preview ? (
                     <TextareaAutosize 

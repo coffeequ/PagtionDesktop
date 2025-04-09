@@ -5,19 +5,11 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-
-interface IUser {
-    id: string,
-    email: string,
-    name: string,
-    image: string | null
-}
+import { GetUser } from "@/actions/user";
 
 export default function UserItem(){
 
-    const getUser = localStorage.getItem("user");
-
-    const user: IUser = JSON.parse(getUser as string);
+    const user = GetUser();
     
     const navigate = useNavigate();
 

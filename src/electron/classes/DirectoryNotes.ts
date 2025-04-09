@@ -1,4 +1,4 @@
-import { app } from "electron";
+import { app, net } from "electron";
 import { existsSync, mkdirSync, promises, readFile, unlink, writeFile } from "fs";
 import path from "path";
 import { Note } from "./Note.js";
@@ -31,16 +31,11 @@ export class DirectoryNotes{
           });
         });
     }
-    
+    updateMap = new Map();
     async readNotesDirectory(){
       if(!existsSync(this.folderPath)){
         mkdirSync(this.folderPath, { recursive: true });
-        //console.log("Folder with notes is create: ", this.folderPath);
       }
-      // else{
-      //   console.log("folder with notes exists: ", this.folderPath);
-      // }
-
       const files = await promises.readdir(this.folderPath);
       const promiseFiles = files.map(async (item) => {
         const filePath = path.join(this.folderPath, item);
@@ -49,6 +44,8 @@ export class DirectoryNotes{
       });
       const notes: Note[] = await Promise.all(promiseFiles);
       this.notes = notes;
+      this.notes.forEach((item) => {
+      })
     }
       
     async createNotesDirectory(note: Note): Promise<Note> {
@@ -61,6 +58,7 @@ export class DirectoryNotes{
           } else {
             //console.log("createNote: ", note);
             this.notes.push(note);
+            this.updateMap.set(note.noteId, note);
             resolve(note);
           }
         });
@@ -77,30 +75,51 @@ export class DirectoryNotes{
           }
           else {
             const indexDelete = this.notes.findIndex((item) => item.noteId === noteId);
-            //console.log(indexDelete);
+            if(indexDelete === -1){
+              throw new Error(`Ошибка удаления. Заметка не была найдена`);
+            }
             const result = this.notes.splice(indexDelete, 1);
+            const [deleteNote] = this.notes.splice(indexDelete, 1); 
+            this.updateMap.delete(deleteNote.noteId);
             resolve(result);
           }
         });
        })
     }
       
-    async editNoteDirectory(note : Note): Promise<Note> {
-        return new Promise((resolve, rejects) => {
-          const indexDelete = this.notes.findIndex((item) => item.noteId === note.noteId);
-          this.notes.splice(indexDelete, 1);
-          writeFile(`${this.folderPath}/${note.noteId}.json`, JSON.stringify(note), (err) => {
-            if(err){
-              //console.log(err);
-              rejects(err);
-            }
-            else {
-              this.notes.push(note);
-              resolve(note);
-            }
-          });
-        })
-    }
+    // async editNoteDirectory(note : Note): Promise<Note> {
+    //     return new Promise((resolve, rejects) => {
+    //       const indexDelete = this.notes.findIndex((item) => item.noteId === note.noteId);
+    //       this.notes.splice(indexDelete, 1);
+    //       writeFile(`${this.folderPath}/${note.noteId}.json`, JSON.stringify(note), (err) => {
+    //         if(err){
+    //           //console.log(err);
+    //           rejects(err);
+    //         }
+    //         else {
+    //           this.notes.push(note);
+    //           resolve(note);
+    //         }
+    //       });
+    //     })
+    // }
+
+    async editNoteDirectory(note : IUpdateProps): Promise<IUpdateProps> {
+      return new Promise((resolve, rejects) => {
+        // const indexDelete = this.notes.findIndex((item) => item.noteId === note.noteId);
+        // this.notes.splice(indexDelete, 1);
+        writeFile(`${this.folderPath}/${note.noteId}.json`, JSON.stringify(note), (err) => {
+          if(err){
+            //console.log(err);
+            rejects(err);
+          }
+          else {
+            // this.notes.push(note);
+            resolve(note);
+          }
+        });
+      })
+  }
 
     async recursiveRestoreNote(noteId: string) {
       this.notes.forEach((item) => {
@@ -151,17 +170,36 @@ export class DirectoryNotes{
       return note;
     }
 
-    async updateNotes({ noteId, title, content, isPublished }: IUpdateProps){
-      this.notes.find((item) => {
-        if(item.noteId === noteId){
-          //console.log(item);
-          item.title = title;
-          item.content = content;
-          item.isPublished = isPublished;
-          this.editNoteDirectory(item);
-        }
-      });
+    // async updateNotes({ noteId, title, content, isPublished }: IUpdateProps){
+    //   this.notes.find((item) => {
+    //     if(item.noteId === noteId){
+    //       //console.log(item);
+    //       item.title = title;
+    //       item.content = content;
+    //       item.isPublished = isPublished;
+    //       this.editNoteDirectory(item);
+    //     }
+    //   });
       
+    // }
+    async updateNotes({ noteId, title, content, isPublished }: IUpdateProps){
+      if(this.updateMap.has(noteId)){
+        const item: IUpdateProps = this.updateMap.get(noteId);
+        if(title !== undefined) item.title = title;
+        if(content !== undefined) item.content = content;
+        item.isPublished = isPublished;
+        await this.editNoteDirectory(item);
+        return;
+      }
+      else{
+        this.notes.find(async (item) => {
+          if(item.noteId === noteId){
+            this.updateMap.set(noteId, item);
+            await this.updateNotes(item);
+            return;
+          }
+        })
+      }
     }
 
     async trashNote(userId: string){

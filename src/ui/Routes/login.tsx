@@ -9,19 +9,33 @@ export default function login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = GetUser();
-    //console.log(user);
+    //@ts-ignore
+    //window.electronAPI.syncDeepLinkGoogle();
+    let user = GetUser();
+    console.log("user: ");
     if(user){
       navigate("/document/startPage");
+    }
+    else{
+      //@ts-ignore
+      user = window.electronAPI.syncDeepLinkGoogle((event, data) => {
+        localStorage.removeItem("user");
+        localStorage.setItem("user", JSON.stringify(data));
+        navigate("/document/startPage");
+    });
     }
   }, [])
   
   return (
     <div className="h-full dark:bg-[#1f1f1f]">
       <main className="h-full pt-20 dark:bg-[#1f1f1f]">
-        <Suspense fallback={<Spinner/>}>
-          <LoginForm/>
-        </Suspense>
+        <div className="grid h-full place-items-center">
+          <div className="flex w-full max-w-sm flex-col gap-6">
+            <Suspense fallback = { <div><Spinner/></div> }>
+              <LoginForm />
+            </Suspense>
+          </div>
+        </div>
       </main>
     </div>
   )

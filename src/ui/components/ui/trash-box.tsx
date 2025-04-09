@@ -39,12 +39,14 @@ export default function TrashBox(){
         const fetchData = async () => {
             //@ts-ignore
             const data = await window.electronAPI.trashNote(user.id);
+            console.log("trash-data: ", data);
             setDocuments(data);
         }
         fetchData();
     }, [updateTrash]);
 
     const filtredDocuments = documents.filter((document: INote) => {
+        console.log("notes-filters: ", document);
         return document.title.toLowerCase().includes(search.toLowerCase());
     });
 
@@ -53,7 +55,6 @@ export default function TrashBox(){
     }
 
     function onRestore(event: React.MouseEvent<HTMLDivElement, MouseEvent>, documentId: string){
-        debugger
         event.stopPropagation();
 
         //@ts-ignore

@@ -33,10 +33,10 @@ export default function Title({initialData}: TitleProps){
         setIsEditing(false);
     }
 
-    function onChange(event: React.ChangeEvent<HTMLInputElement>){
+    async function onChange(event: React.ChangeEvent<HTMLInputElement>){
         setTitle(event.target.value);
         //@ts-ignore
-        window.electronAPI.update(initialData.id, event.target.value || "Untitled");
+        await window.electronAPI.update({noteId: initialData.noteId, title: event.target.value || "Untitled"});
     }
 
     function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {

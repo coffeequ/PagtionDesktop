@@ -18,7 +18,7 @@ interface IPublishProps {
     refresh: () => void;
 }
 
-export default function Publish({ initialData, refresh } : IPublishProps) {
+export default function Publish({ initialData } : IPublishProps) {
 
     const origin = useOrigin();
 
@@ -33,10 +33,10 @@ export default function Publish({ initialData, refresh } : IPublishProps) {
         setIsSubmitting(true);
         
         //@ts-ignore
-        const promise = window.electronAPI.updateNote({noteId: initialData.id, isPublished: true}).finally(() => {
-            setIsSubmitting(false);
-            refresh();
-        });
+        // const promise = window.electronAPI.updateNote({noteId: initialData.id, isPublished: true}).finally(() => {
+        //     setIsSubmitting(false);
+        //     refresh();
+        // });
 
         toast.promise(promise, {
             loading: "Публикация...",
@@ -49,10 +49,10 @@ export default function Publish({ initialData, refresh } : IPublishProps) {
         setIsSubmitting(true);
         
         //@ts-ignore
-        const promise = window.electronAPI.updateNote({noteId: initialData.id, isPublished: false}).finally(() => {
-            setIsSubmitting(false);
-            refresh();
-        });
+        // const promise = window.electronAPI.updateNote({noteId: initialData.id, isPublished: false}).finally(() => {
+        //     setIsSubmitting(false);
+        //     refresh();
+        // });
         
         toast.promise(promise, {
             loading: "Отмена публикации...",

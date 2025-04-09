@@ -5,10 +5,11 @@ interface IUser {
     image: string | null
 }
 
-const getUser = localStorage.getItem("user");
-
-const user: IUser = JSON.parse(getUser as string);
-
 export function GetUser(){
+    
+    const getUser = localStorage.getItem("user");
+
+    const user: IUser = JSON.parse(getUser as string);
+
     return user;
 }
