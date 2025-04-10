@@ -1,4 +1,4 @@
-import { Moon, Sun } from "lucide-react"
+import { Computer, Moon, Sun } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -24,23 +24,20 @@ export function ModeToggle() {
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => {
           setTheme("light");
-          //@ts-ignore
-          window.electronAPI.toggleLight();
         }}>
+          <Sun/>
           Светлая
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => {
             setTheme("dark");
-            //@ts-ignore
-            window.electronAPI.toggleDark();
         }}>
+          <Moon/>
           Темная
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => {
             setTheme("system");
-            //@ts-ignore
-            window.electronAPI.system();
         }}>
+          <Computer/>
           Системная
         </DropdownMenuItem>
       </DropdownMenuContent>

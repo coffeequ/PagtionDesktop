@@ -36,17 +36,16 @@ export default function Banner({documentId}: IBannerProps){
         if(!user.id) return;
 
         //@ts-ignore
-        const promise = window.electronAPI.restore(documentId);
+        const promise = window.electronAPI.restore(documentId).then((item) => {
+            triggerRefresh();
+            navigate("/document/startPage");
+        });
 
         toast.promise(promise, {
             loading: "Восстановление заметки...",
             success: "Восстановление произошло успешно!",
             error: "Произошла ошибка при восстановлении."
         });
-
-        triggerRefresh();
-        
-        navigate("/document/startPage");
     }
 
     return(

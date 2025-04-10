@@ -1,15 +1,17 @@
 
 import{
     BlockNoteEditor,
-    PartialBlock
+    PartialBlock,
 } from "@blocknote/core";
 import { useCreateBlockNote } from "@blocknote/react"
 import { BlockNoteView } from "@blocknote/mantine"
+import { ru } from "@blocknote/core/locales"
 
 import "@blocknote/mantine/style.css"
 
 import { useDebounceCallback } from "usehooks-ts";
 import { useEffect } from "react";
+import { useTheme } from "@/providers/theme-providers";
 
 
 interface IEditorProps{
@@ -20,17 +22,13 @@ interface IEditorProps{
 
 function Editor({ onChange, initialContent, editable } : IEditorProps){
     
-    let resolvedTheme;
-
-    //@ts-ignore
-    window.electronAPI.currentTheme().then((item) => {
-        resolvedTheme = item;
-    })
+    const { theme } = useTheme();
 
     const debouncedOnChange = useDebounceCallback(onChange, 200);
 
     const editor: BlockNoteEditor = useCreateBlockNote({
         initialContent: initialContent ? JSON.parse(initialContent) as PartialBlock[] : undefined,
+        dictionary: ru
     });
 
    useEffect(() => {
@@ -39,7 +37,7 @@ function Editor({ onChange, initialContent, editable } : IEditorProps){
     
     return(
         <div>
-            <BlockNoteView editor={editor} theme={ resolvedTheme === "dark" ? "dark" : "light" } editable = {editable}>
+            <BlockNoteView editor={editor} theme={ theme === "dark" ? "dark" : "light" } editable = {editable}>
 
             </BlockNoteView>
         </div>

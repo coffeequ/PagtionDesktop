@@ -7,9 +7,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
    syncDeepLinkGoogle: (callback: any) => {
       ipcRenderer.on("deep-link", callback);
    },
-   toggleLight: () => ipcRenderer.invoke('dark-mode:light'),
-   toggleDark: () => ipcRenderer.invoke('dark-mode:dark'),
-   system: () => ipcRenderer.invoke('dark-mode:system'),
+   setTheme: (value: string) => {
+      ipcRenderer.invoke("ToggleTheme", value);
+   },
    currentTheme: () => ipcRenderer.invoke("current-theme"),
    
    createNote: (title: string, userId: string, parentDocumentId?: string) => {

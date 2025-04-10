@@ -58,15 +58,16 @@ export default function TrashBox(){
         event.stopPropagation();
 
         //@ts-ignore
-        const promise = window.electronAPI.restore(documentId, user.id);
+        const promise = window.electronAPI.restore(documentId, user.id).then(() => {
+            triggerRefresh();
+            setUpdateTrash((prev) => !prev);    
+        });
 
         toast.promise(promise, {
             loading: "Восстановление заметки...",
             success: "Заметка была успешно восстановлена!",
             error: "Ошибка восставновление заметки"
         });
-        triggerRefresh();
-        setUpdateTrash((prev) => !prev);
     }
 
 

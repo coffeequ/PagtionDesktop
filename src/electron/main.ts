@@ -9,6 +9,9 @@ interface IUser {
   name: string,
   image: string | null
 }
+
+type Theme = "dark" | "light" | "system";
+
 //Remind: В продакшене использовать две .., в дев .
 let mainWindow: BrowserWindow;
 
@@ -26,10 +29,7 @@ function createMainWindow(){
 
   mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "login"});
 
-  mainWindow.on("closed", () => {
-    mainWindow.close(); 
-  });
-  
+  mainWindow.menuBarVisible = false;  
 }
 
 //Создание окна при полной загрузки приложения
@@ -46,35 +46,15 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-function GetCurrentTheme(theme: string): string{
-  let value = localStorage.getItem(theme);
-  if(value){
-    value = "system";
-  }
-  return value as string;
-}
-
 //Открытие аутентификации в браузере
 ipcMain.handle("openAuth", (event, provider: string) => {
-  shell.openExternal(`http://localhost:3000/electronRedirectOauth?selectProviders=${provider}`);
+  shell.openExternal(`https://pagtion.vercel.app/electronRedirectOauth?selectProviders=${provider}`);
 })
 
 //Смена темы
-ipcMain.handle('dark-mode:light', () => {
-  nativeTheme.themeSource = "light"
-});
-
-ipcMain.handle('dark-mode:dark', () => {
-  nativeTheme.themeSource = "dark"
-});
-
-ipcMain.handle('dark-mode:system', () => {
-  nativeTheme.themeSource = 'system'
-});
-
-ipcMain.handle("current-theme", () => {
-  return nativeTheme.themeSource;
-});
+ipcMain.handle("ToggleTheme", (event, theme: Theme) => {
+  nativeTheme.themeSource = theme;
+})
 
 //Не допускать открытие нового окна и передача данные из окна браузера
 const gotTheLock = app.requestSingleInstanceLock();
@@ -156,7 +136,7 @@ ipcMain.handle("get-all-notes", async (event) => {
 });
 
 ipcMain.handle("restore-notes", async (event, noteId: string) => {
-  return directoryNotes.recursiveRestoreNote(noteId);
+  return directoryNotes.restoreNote(noteId);
 })
 
 ipcMain.handle("sidebar-notes", async (event, userId: string, parentDocumentId: string) => {
@@ -164,7 +144,7 @@ ipcMain.handle("sidebar-notes", async (event, userId: string, parentDocumentId: 
 })
 
 ipcMain.handle("archived-notes", async (event, noteId: string) => {
-  return directoryNotes.recursiveArchivedNote(noteId);
+  return directoryNotes.archivedNote(noteId);
 })
 
 ipcMain.handle("getId-notes", async (event, noteId: string) => {
