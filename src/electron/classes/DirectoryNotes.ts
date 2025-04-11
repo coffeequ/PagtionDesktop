@@ -68,22 +68,22 @@ export class DirectoryNotes{
     }
     
       
-    async deleteNoteDirectory(noteId: string): Promise<Note[]>{
+    async deleteNoteDirectory(noteId: string): Promise<Note>{
        return new Promise((resolve, rejects) => {
         unlink(`${this.folderPath}/${noteId}.json`, (err) => {
           if(err){
-            //console.log(err);
             rejects(err);
           }
           else {
             const indexDelete = this.notes.findIndex((item) => item.noteId === noteId);
+            console.log("indexDelete: ", indexDelete);
             if(indexDelete === -1){
               throw new Error(`Ошибка удаления. Заметка не была найдена`);
             }
-            const result = this.notes.splice(indexDelete, 1);
             const [deleteNote] = this.notes.splice(indexDelete, 1); 
+            console.log("Delete note: ", [deleteNote]);
             this.updateMap.delete(deleteNote.noteId);
-            resolve(result);
+            resolve(deleteNote);
           }
         });
        })
@@ -105,13 +105,15 @@ export class DirectoryNotes{
   async restoreNote(noteId: string){
     if(this.updateMap.has(noteId)){
       const note: Note = this.updateMap.get(noteId);
+      const parentNote: Note = this.updateMap.get(note.parentDocumentId); 
+      if(parentNote && parentNote.isArchived){
+        note.parentDocumentId = undefined;
+      }
       note.isArchived = false;
-      this.updateNotes(note);
-      if(note.parentDocumentId !== undefined && note.isArchived){
-        for(const item of this.notes){
-          if(item.parentDocumentId === noteId){
-            await this.restoreNote(item.noteId);
-          }
+      await this.updateNotes(note);
+      for(const item of this.notes){
+        if(item.parentDocumentId === noteId){
+          await this.restoreNote(item.noteId);
         }
       }
     }

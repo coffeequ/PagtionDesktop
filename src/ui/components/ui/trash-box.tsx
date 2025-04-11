@@ -73,17 +73,18 @@ export default function TrashBox(){
 
     function onRemove(documentId: string){
         //@ts-ignore
-        const promise = window.electronAPI.deleteNotes(documentId);
+        const promise = window.electronAPI.deleteNotes(documentId).then((item) => {
+            setUpdateTrash((prev) => !prev);
+            if(params.documentId === documentId){
+                navigate("/document/startPage");
+            }
+        });
 
         toast.promise(promise, {
             loading: "Удаление заметки...",
             success: "Удаление произошло успешно!",
             error: "Ошибка удаления заметки"
         });
-        setUpdateTrash((prev) => !prev);
-        if(params.documentId === documentId){
-            navigate("/document/startPage")
-        }
     }
 
     if(documents === undefined){
