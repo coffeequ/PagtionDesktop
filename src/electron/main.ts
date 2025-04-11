@@ -39,7 +39,7 @@ app.whenReady().then(async () => {
 });
 
 //Создание кастомного протокола на macOS
-app.setAsDefaultProtocolClient("myapp");
+app.setAsDefaultProtocolClient("pagtion");
 
 //Завершение работы приложение
 app.on('window-all-closed', () => {
@@ -62,7 +62,7 @@ if (!gotTheLock) {
   app.quit();
 } else {
   app.on('second-instance', (event, argv, workingDirectory) => {
-    const deepLink = argv.find(arg => arg.startsWith('myapp://'));
+    const deepLink = argv.find(arg => arg.startsWith('pagtion://'));
     if (deepLink) {
       //console.log("Получен deep link (в second-instance):", deepLink);
 
@@ -83,7 +83,7 @@ if (!gotTheLock) {
 
         mainWindow.webContents.send("deep-link", user);
         
-        mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "document"});
+        mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
         
         mainWindow.isFocused();
       }
@@ -103,7 +103,7 @@ app.on("open-url", (event, url) => {
   }
   if(mainWindow){
     mainWindow.webContents.send("deep-link", user);
-    mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "document"});
+    mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
     mainWindow.isFocused();    
   }  
 });
