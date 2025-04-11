@@ -185,7 +185,7 @@ export default function Navigation(){
                 )} 
                 >
                 {
-                    !!params.documentId ? (
+                    !!params.id ? (
                         <Navbar isCollapsed = {isCollapsed} onResetWidth = {resetWidth}/>
                     )
                     :(

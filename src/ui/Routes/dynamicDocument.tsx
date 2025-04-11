@@ -70,6 +70,7 @@ export default function DocumentIdPage(){
     
     return(
         <div className="dark:bg-[#1F1F1F]">
+            <div className="w-full h-[12vh]"/>
             <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
                 <Toolbar key={ document.noteId } initialData = { document } onTitleChange={onChangeTitle} />
                 <Suspense fallback={<Spinner/>}>

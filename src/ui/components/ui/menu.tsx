@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { useNavigate } from "react-router-dom";
 import { GetUser } from "@/actions/user";
+import useRefreshStore from "@/hooks/use-refresh";
 
 interface IMenuProps {
     documentId: string;
@@ -20,6 +21,7 @@ export default function Menu({documentId} : IMenuProps) {
 
     const userName = GetUser();
 
+    const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
 
     function onArchive() {
         //@ts-ignore
@@ -31,6 +33,8 @@ export default function Menu({documentId} : IMenuProps) {
             error: "Перемещение не удалось."
         })
 
+        triggerRefresh();
+
         navigate("/document/startPage");
     }
 
@@ -41,7 +45,7 @@ export default function Menu({documentId} : IMenuProps) {
                     <MoreHorizontal className="h-4 w-4"/>
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-60" align="end" alignOffset={8} forceMount>
+            <DropdownMenuContent className="w-70 h-20" align="end" alignOffset={8} forceMount>
                 <DropdownMenuItem onClick={onArchive}>
                     <Trash className="h-4 w-4 mr-2" />
                     Удалить

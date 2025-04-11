@@ -1,14 +1,8 @@
-"use client"
-
-// import IconPicker from "./icon-picker";
-// import { Button } from "@/components/ui/button";
-// import { X } from "lucide-react";
 import { ComponentRef, useRef, useState } from "react";
 
 import TextareaAutosize from "react-textarea-autosize"
 
 import { useDebounceCallback } from "usehooks-ts";
-// import useRefreshStore from "@/hooks/use-refresh";
 import { INote } from "@/interfaces/INote";
 
 interface IToolbarProps {
@@ -20,8 +14,6 @@ interface IToolbarProps {
 export default function Toolbar({ initialData, preview, onTitleChange } : IToolbarProps){
 
     const inputRef = useRef<ComponentRef<"textarea">>(null);
-
-    // const [icon, setIcon] = useState(initialData.icon);
 
     const [isEditing, setIsEditing] = useState(false);
 
@@ -57,37 +49,8 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
         }
     }
 
-    // function onIconSelect(icon: string){
-    //     //@ts-ignore
-    //     window.electronAPI.updateNote({noteId: initialData.noteId, icon}).then((item) => setIcon(item.icon));
-    //     triggerRefresh();
-    // }
-
-    // function onIconRemove(){
-    //     //@ts-ignore
-    //     window.electronAPI.idNote(initialData.noteId).then((item: INote) =>{
-    //         item.icon = "";
-    //         setIcon("");
-    //     });
-    //     triggerRefresh();
-    // }
-
     return(
         <div className="pl-[54px] group relative">
-            {/* {
-                !!icon && !preview && (
-                    <div className="flex items-center gap-x-2 group/icon pt-6">
-                        <IconPicker onChange={onIconSelect}>
-                            <p className="text-6xl hover:opacity-75 transition">
-                                {icon}
-                            </p>
-                            <Button onClick={onIconRemove} className="rounded-full opacity-0 group-hover/icon:opacity-100 transition text-muted-foreground text-xs" variant='outline' size="icon">
-                                <X className="h-4 w-4"/>
-                            </Button>
-                        </IconPicker>
-                    </div>
-                )
-            } */}
             {
                 isEditing && !preview ? (
                     <TextareaAutosize 

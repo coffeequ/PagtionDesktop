@@ -50,7 +50,7 @@ export default function Banner({documentId}: IBannerProps){
 
     return(
         <>
-            <div className="w-full bg-rose-500 text-center text-sm p-2 text-white flex items-center gap-x-2 justify-center">
+            <div className="w-full bg-rose-500 text-center text-sm p-2 text-white flex items-center gap-x-2 justify-center mb-2">
                 <p>
                     Страница находится в корзине.
                 </p>
