@@ -1,7 +1,14 @@
 {
     "appId": "com.pagtion.vercel",
-    "files": ["dist-electron", "dist-react"],
-    "extraResources": ["dist-electron/preload.cjs"],
+    "files": ["dist-electron", "dist-react", "Icon"],
+    "extraResources": [
+        "dist-electron/preload.cjs",
+        {
+            "from": "./ppl-icon.ico",
+            "to": "Icon",
+            "filter": "*.ico"
+        }
+    ],
     "protocols":{
         "name": "Ammm",
         "schemes": ["ammm"]

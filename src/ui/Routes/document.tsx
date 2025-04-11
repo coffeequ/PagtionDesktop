@@ -1,10 +1,16 @@
-export default function DocumentPage(){   
+import { Outlet } from "react-router-dom";
+import Navigation from "@/components/ui/navigation";
+import SearchCommand from "@/components/ui/search-command";
+
+export default function DocumentPage(){
+
     return(
-        <div>
-            <h1>Hello world after auth</h1>
-            <code>
-                {window.localStorage.getItem("user")}
-            </code>
+        <div className="h-full flex dark:bg-[#1F1F1F]">
+            <Navigation/>
+            <main className="flex-1 h-full overflow-y-auto">
+                <SearchCommand/>
+                <Outlet/>
+            </main>
         </div>
     );
 }

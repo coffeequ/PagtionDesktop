@@ -38,8 +38,9 @@ export default function LoginForm(){
         setSuccess("");
         const email = values.email;
         const password = values.password;
+
         try {
-            const response = await fetch('http://localhost:3000/api/authenticate', {
+            const response = await fetch('https://pagtion.vercel.app/api/authenticate', {
                     method: 'POST',
                     headers: {
                             'Content-Type': 'application/json',
@@ -51,8 +52,8 @@ export default function LoginForm(){
             if(response.ok) {
                 response.json().then((item) => {
                 window.localStorage.setItem("user", JSON.stringify(item));
-                navigate("/document");});
                 setSuccess("Авторизация прошла успешно!");
+                navigate("/document/startPage");});
             return;
           } else {
             setError("Произошла ошибка авторизации");
@@ -112,7 +113,7 @@ export default function LoginForm(){
             <hr className="w-48 h-1 mx-auto my-2 bg-gray-200 border-0 rounded-sm md:my-4 dark:bg-gray-500"/>
             <Button variant="ghost" className="mt-2" onClick={() =>{
                 //@ts-ignore
-                    window.electronAPI.handleOpenGoogleProvirder("google");
+                    window.electronAPI.handleOpenProvirder("google");
                 }}>
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="text-current h-5 w-5 opacity-90">
                     <path d="M12.48 10.92v3.28h7.84a6.95 6.95 0 0 1-1.79 4.13 8.03 8.03 0 0 1-6.05 2.4c-4.83 0-8.6-3.89-8.6-8.72a8.6 8.6 0 0 1 14.5-6.37l2.31-2.3A11.33 11.33 0 0 0 12.48 0C5.87 0 .31 5.39.31 12s5.56 12 12.17 12c3.57 0 6.27-1.17 8.37-3.36 2.16-2.16 2.84-5.21 2.84-7.67 0-.76-.05-1.46-.17-2.05H12.48z"></path>
@@ -121,7 +122,7 @@ export default function LoginForm(){
             </Button>
             <Button variant="ghost" className="mt-2" onClick={() => {
                 //@ts-ignore
-                window.electronAPI.handleOpenGoogleProvirder("yandex");
+                window.electronAPI.handleOpenProvirder("yandex");
             }}>
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
             <path d="M2.04 12c0-5.523 4.476-10 10-10 5.522 0 10 4.477 10 10s-4.478 10-10 10c-5.524 0-10-4.477-10-10z" fill="#FC3F1D"/>

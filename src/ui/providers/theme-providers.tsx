@@ -51,8 +51,10 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
-      setTheme(theme)
+      localStorage.setItem(storageKey, theme);
+      setTheme(theme);
+      //@ts-ignore
+      window.electronAPI.setTheme(theme);
     },
   }
 
