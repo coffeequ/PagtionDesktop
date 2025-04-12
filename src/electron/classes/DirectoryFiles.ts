@@ -10,6 +10,10 @@ export class DirectoryFile{
     private index: number = 1;
 
     filesNameMap = new Map();
+
+    GetFolderFilesPath(){
+        return this.filesFolderPath;
+    }
     
     createFolder(): void {
         console.log(this.filesFolderPath);

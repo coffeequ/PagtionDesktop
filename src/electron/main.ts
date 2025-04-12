@@ -167,3 +167,11 @@ ipcMain.handle("search-note", async(event, userId: string) => {
 ipcMain.handle("upload-file", async(event, file: IFilesUpload) => {
   return directoryFile.handleUpload(file);
 });
+
+ipcMain.handle("path-notes", () => {
+  return directoryNotes.GetFolderNotePath();
+});
+
+ipcMain.handle("path-files", () => {
+  return directoryFile.GetFolderFilesPath();
+});

@@ -50,6 +50,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
    },
    handleUploadFile: (file: any) => {
       return ipcRenderer.invoke("upload-file", file);
+   },
+   GetNotePath: () => {
+      return ipcRenderer.invoke("path-notes");
+   },
+   GetFilePath: () => {
+      return ipcRenderer.invoke("path-files");
    }
 });
 

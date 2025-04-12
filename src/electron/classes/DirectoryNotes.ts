@@ -33,6 +33,10 @@ export class DirectoryNotes{
         });
     }
 
+    GetFolderNotePath(): string {
+      return this.folderPath;
+    }
+
     async readNotesDirectory(){
       if(!existsSync(this.folderPath)){
         mkdirSync(this.folderPath, { recursive: true });
