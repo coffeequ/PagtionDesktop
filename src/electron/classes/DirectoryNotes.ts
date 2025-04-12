@@ -1,4 +1,4 @@
-import { app, Net, net } from "electron";
+import { app } from "electron";
 import { existsSync, mkdirSync, promises, readFile, unlink, writeFile } from "fs";
 import path from "path";
 import { Note } from "./Note.js";
@@ -121,54 +121,7 @@ export class DirectoryNotes{
       throw new Error("Ошибка архивации документа");
     }
   }
-
-    // async recursiveArchivedNote(noteId: string) {
-    //   this.notes.forEach((item) => {
-    //     if(item.noteId === noteId){
-    //       item.isArchived = true;
-    //       return;
-    //     }
-    //   });
-    //   this.notes.forEach((item) => {
-    //     if(item.parentDocumentId === noteId){
-    //       this.recursiveArchivedNote(item.parentDocumentId);
-    //     }
-    //     return;
-    //   }) 
-    // }
-
-    // async archivedNote(noteId: string){
-    //   if(this.updateMap.has(noteId)){
-    //     const note: Note = this.updateMap.get(noteId);
-    //     note.isArchived = true;
-    //     if(note.parentDocumentId === undefined || note.parentDocumentId === null){
-    //       return;
-    //     }
-    //     this.notes.forEach(async (item) => {
-    //       if(note.parentDocumentId !== undefined || note.parentDocumentId !== null){
-    //         item.isArchived = true;
-    //         await this.archivedNote(item.noteId);
-    //       }
-    //     });
-    //   }
-    // }
-
-    // async archivedNote(noteId: string){
-    //   if(this.updateMap.has(noteId)){
-    //     const note: Note = this.updateMap.get(noteId);
-    //     note.isArchived = true;
-    //     if(note.parentDocumentId === undefined){
-    //       return;
-    //     }
-    //     else{
-    //       this.notes.forEach(async (item) => {
-    //         if(item.parentDocumentId === noteId)
-    //         await this.archivedNote(item.noteId);
-    //       })
-    //     }
-    //   }
-    // }
-
+  
     async archivedNote(noteId: string){
       if(this.updateMap.has(noteId)){
         const note: Note = this.updateMap.get(noteId);

@@ -3,12 +3,10 @@ import path from 'path';
 import { DirectoryNotes } from './classes/DirectoryNotes.js';
 import { Note } from './classes/Note.js';
 import { IUpdateProps } from './interfaces/IUpdateNote.js';
-interface IUser {
-  id: string,
-  email: string,
-  name: string,
-  image: string | null
-}
+import { IFilesUpload } from './interfaces/IFilesUpload.js';
+import { DirectoryFile } from './classes/DirectoryFiles.js';
+import { IUser } from './interfaces/IUser.js';
+
 
 type Theme = "dark" | "light" | "system";
 
@@ -16,6 +14,7 @@ type Theme = "dark" | "light" | "system";
 let mainWindow: BrowserWindow;
 
 let directoryNotes = new DirectoryNotes();
+let directoryFile = new DirectoryFile();
 
 //Главное окно приложения
 function createMainWindow(){
@@ -29,11 +28,13 @@ function createMainWindow(){
 
   mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "login"});
 
-  mainWindow.menuBarVisible = false;  
+  mainWindow.menuBarVisible = false;
 }
 
 //Создание окна при полной загрузки приложения
 app.whenReady().then(async () => {
+  directoryFile.createFolder();
+  directoryFile.readNameFiles();
   directoryNotes.readNotesDirectory();
   createMainWindow();
 });
@@ -137,28 +138,32 @@ ipcMain.handle("get-all-notes", async (event) => {
 
 ipcMain.handle("restore-notes", async (event, noteId: string) => {
   return directoryNotes.restoreNote(noteId);
-})
+});
 
 ipcMain.handle("sidebar-notes", async (event, userId: string, parentDocumentId: string) => {
   return directoryNotes.sidebar(userId, parentDocumentId);
-})
+});
 
 ipcMain.handle("archived-notes", async (event, noteId: string) => {
   return directoryNotes.archivedNote(noteId);
-})
+});
 
 ipcMain.handle("getId-notes", async (event, noteId: string) => {
   return await directoryNotes.getIdNotes(noteId);
-})
+});
 
 ipcMain.handle("update-notes", async (event, NoteUpdate: IUpdateProps) => {
   return directoryNotes.updateNotes({...NoteUpdate});
-})
+});
 
 ipcMain.handle("trash-notes", async (event, noteId: string) => {
   return directoryNotes.trashNote(noteId);
-})
+});
 
 ipcMain.handle("search-note", async(event, userId: string) => {
   return directoryNotes.searchNote(userId);
-})
+});
+
+ipcMain.handle("upload-file", async(event, file: IFilesUpload) => {
+  return directoryFile.handleUpload(file);
+});

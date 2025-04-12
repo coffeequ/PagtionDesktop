@@ -26,9 +26,18 @@ function Editor({ onChange, initialContent, editable } : IEditorProps){
 
     const debouncedOnChange = useDebounceCallback(onChange, 200);
 
+    async function handeUpload(file: File){
+        console.log(file);
+        const name = file.name;
+        const arrayBuffer = await file.arrayBuffer();
+        //@ts-ignore
+        return window.electronAPI.handleUploadFile({name, arrayBuffer});
+    }
+
     const editor: BlockNoteEditor = useCreateBlockNote({
         initialContent: initialContent ? JSON.parse(initialContent) as PartialBlock[] : undefined,
-        dictionary: ru
+        dictionary: ru,
+        uploadFile: handeUpload
     });
 
    useEffect(() => {

@@ -47,6 +47,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
    },
    searchNote: (userId: string) => {
       return ipcRenderer.invoke("search-note", userId);
+   },
+   handleUploadFile: (file: any) => {
+      return ipcRenderer.invoke("upload-file", file);
    }
 });
 
