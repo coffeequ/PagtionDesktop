@@ -5,7 +5,7 @@ export interface INote{
     title: string;
     isArchived: boolean; 
     parentDocumentId : string | undefined;
-    coverImage : string;
+    coverImage : string | undefined;
     icon : string | undefined; 
     isPublished : boolean; 
     creationTime: Number;

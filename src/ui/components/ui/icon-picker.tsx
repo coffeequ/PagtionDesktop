@@ -7,6 +7,7 @@ import{
     PopoverContent,
     PopoverTrigger
 } from "@radix-ui/react-popover";
+import { useTheme } from "@/providers/theme-providers";
 
 interface IIconPickerProps{
     onChange: (icon: string) => void;
@@ -16,17 +17,18 @@ interface IIconPickerProps{
 
 export default function IconPicker({ onChange, children, asChild } : IIconPickerProps){
     
-    //@ts-ignore
-    const resolvedTheme  = window.electronAPI.currentTheme();
+    const { theme } = useTheme()
 
     const themeMap = {
         "dark": Theme.DARK,
         "light": Theme.LIGHT
     };
 
-    const currentTheme = (resolvedTheme || "light") as keyof typeof themeMap;
+    const currentTheme = (theme || "light") as keyof typeof themeMap;
 
-    const theme = themeMap[currentTheme];
+    //const theme = themeMap[currentTheme];
+
+    const resolvedTheme = themeMap[currentTheme];
     
     return(
         <Popover>
@@ -36,7 +38,7 @@ export default function IconPicker({ onChange, children, asChild } : IIconPicker
             <PopoverContent className="z-[99] p-0 w-full border-none shadow-none">
                 <EmojiPicker 
                     height={350}
-                    theme={theme}
+                    theme={resolvedTheme}
                     onEmojiClick={(data: { emoji: string; }) => onChange(data.emoji)}
                 />
             </PopoverContent>

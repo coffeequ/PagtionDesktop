@@ -21,7 +21,9 @@ export class Note{
 
     parentDocumentId: string | undefined;
 
-    icon: string | undefined
+    icon: string | undefined;
+
+    coverImage: string | undefined;
 
     isPublished: boolean | undefined = false;
 

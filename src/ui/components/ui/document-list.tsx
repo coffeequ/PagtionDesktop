@@ -86,7 +86,7 @@ export default function DocumentList({ parentDocumentId, level = 0} : DocumentLi
                         onClick={() => onRedirect(document.noteId)}
                         label = {document.title}
                         icon = {FileIcon}
-                        active = {params.documentId === document.noteId}
+                        active = {params.id === document.noteId}
                         level = {level}
                         onExpand={() => onExpand(document.noteId)}
                         expanded = {expanded[document.noteId]}

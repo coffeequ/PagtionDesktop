@@ -5,10 +5,14 @@ import { GetUser } from "@/actions/user";
 import { useParams } from "react-router-dom";
 import { INote } from "@/interfaces/INote";
 import Spinner from "@/components/ui/spinner";
+import { useCoverImage } from "@/hooks/use-cover-image";
+import Cover from "@/components/ui/cover";
 
 export default function DocumentIdPage(){
 
     const { id } = useParams();
+
+    const { url, setCoverImage } = useCoverImage();
 
     const Editor = useMemo(() => lazy(() => import('@/components/ui/editor')), []);
     
@@ -20,14 +24,19 @@ export default function DocumentIdPage(){
 
     useEffect(() => {
         async function fetchDocument(){
-            console.log("user-dynamicDocument: ", user);
+            // console.log("user-dynamicDocument: ", user);
             if(!user.id){
                 throw new Error("Не найден id пользователя");
             };
             //@ts-ignore
             await window.electronAPI.idNote(id).then((item) => {
-                //console.log("item: ", item);
                 setDocument(item);
+                if(item.coverImage){
+                    setCoverImage(item.coverImage);
+                }
+                else{
+                    setCoverImage("");
+                }
             });
         }
         fetchDocument();
@@ -40,7 +49,6 @@ export default function DocumentIdPage(){
         }
         //@ts-ignore
         await window.electronAPI.updateNote({noteId: id as string, title});
-        console.log("title: ", {noteId: id as string, title, content: document?.content});
         triggerRefresh();
     }, [id as string]);
 
@@ -48,7 +56,6 @@ export default function DocumentIdPage(){
     const onChangeContent = useCallback(async (content: string) => {
         //@ts-ignore
         await window.electronAPI.updateNote({noteId: id as string, content});
-        console.log("content: ", {noteId: id as string, content, title: document?.title});
         triggerRefresh();
     }, [id as string])
 
@@ -69,8 +76,8 @@ export default function DocumentIdPage(){
     }
     
     return(
-        <div className="dark:bg-[#1F1F1F]">
-            <div className="w-full h-[12vh]"/>
+        <div className="pb-40 dark:bg-[#1F1F1F]">
+            <Cover key={url} url={url} />
             <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
                 <Toolbar key={ document.noteId } initialData = { document } onTitleChange={onChangeTitle} />
                 <Suspense fallback={<Spinner/>}>

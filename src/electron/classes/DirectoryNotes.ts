@@ -80,12 +80,12 @@ export class DirectoryNotes{
           }
           else {
             const indexDelete = this.notes.findIndex((item) => item.noteId === noteId);
-            console.log("indexDelete: ", indexDelete);
+            // console.log("indexDelete: ", indexDelete);
             if(indexDelete === -1){
               throw new Error(`Ошибка удаления. Заметка не была найдена`);
             }
             const [deleteNote] = this.notes.splice(indexDelete, 1); 
-            console.log("Delete note: ", [deleteNote]);
+            // console.log("Delete note: ", [deleteNote]);
             this.updateMap.delete(deleteNote.noteId);
             resolve(deleteNote);
           }
@@ -157,11 +157,13 @@ export class DirectoryNotes{
       return this.updateMap.get(noteId);
     }
 
-    async updateNotes({ noteId, title, content, isPublished }: IUpdateProps){
+    async updateNotes({ noteId, title, content, isPublished, icon, coverImage}: IUpdateProps){
       if(this.updateMap.has(noteId)){
         const item: IUpdateProps = this.updateMap.get(noteId);
         if(title !== undefined) item.title = title;
         if(content !== undefined) item.content = content;
+        if(icon !== undefined) item.icon = icon;
+        if(coverImage !== undefined) item.coverImage = coverImage;
         item.isPublished = isPublished;
         await this.editNoteDirectory(item);
         return;
@@ -179,13 +181,13 @@ export class DirectoryNotes{
 
     async trashNote(userId: string){
       const trash: Note[] = [];
-      console.log("notes: ", this.notes);
+      // console.log("notes: ", this.notes);
       this.notes.forEach((item) => {
         if(item.isArchived === true && item.userId === userId){
           trash.push(item);
         }
       })
-      console.log("trash: ", trash);
+      // console.log("trash: ", trash);
       return trash;
     }
 

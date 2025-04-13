@@ -27,7 +27,7 @@ function Editor({ onChange, initialContent, editable } : IEditorProps){
     const debouncedOnChange = useDebounceCallback(onChange, 200);
 
     async function handeUpload(file: File){
-        console.log(file);
+        // console.log(file);
         const name = file.name;
         const arrayBuffer = await file.arrayBuffer();
         //@ts-ignore

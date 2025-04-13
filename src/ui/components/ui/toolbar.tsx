@@ -4,6 +4,11 @@ import TextareaAutosize from "react-textarea-autosize"
 
 import { useDebounceCallback } from "usehooks-ts";
 import { INote } from "@/interfaces/INote";
+import useRefreshStore from "@/hooks/use-refresh";
+import { useCoverImage } from "@/hooks/use-cover-image";
+import IconPicker from "./icon-picker";
+import { Button } from "./button";
+import { ImageIcon, Smile, X } from "lucide-react";
 
 interface IToolbarProps {
     initialData: INote
@@ -19,9 +24,13 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
 
     const [value, setValue] = useState(initialData.title);
 
+    const [icon, setIcon] = useState(initialData.icon);
+
+    const coverImage = useCoverImage();
+
     const debounceTitleChange = useDebounceCallback(onTitleChange, 200);
 
-    // const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
+    const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
 
     function enableInput() {
         if(preview) return;
@@ -49,8 +58,66 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
         }
     }
 
+    function onIconSelect(icon: string){
+        // console.log("icon: ", icon);
+        //@ts-ignore
+        window.electronAPI.updateNote({ noteId: initialData.noteId, icon }).then(() => {
+            setIcon(icon);
+            triggerRefresh();
+        });
+    }
+
+    function onIconRemove(){
+        //@ts-ignore
+        window.electronAPI.updateNote({ noteId: initialData.noteId, icon: "" }).then((item: INote) => {
+            setIcon(undefined);
+            triggerRefresh();
+        });
+    }
+
     return(
         <div className="pl-[54px] group relative">
+            {
+                !!icon && !preview && (
+                    <div className="flex items-center gap-x-2 group/icon pt-6">
+                        <IconPicker onChange={onIconSelect}>
+                            <p className="text-6xl hover:opacity-75 transition">
+                                {icon}
+                            </p>
+                            <Button onClick={onIconRemove} className="rounded-full opacity-0 group-hover/icon:opacity-100 transition text-muted-foreground text-xs" variant='outline' size="icon">
+                                <X className="h-4 w-4"/>
+                            </Button>
+                        </IconPicker>
+                    </div>
+                )
+            }
+            {
+                !!icon && preview && (
+                    <p className="text-6xl pt-6">
+                        {icon}
+                    </p>
+                )
+            }
+            <div className="opacity-0 group-hover:opacity-100 flex items-center gap-x-1 py-4">
+                {
+                    !icon && !preview && (
+                        <IconPicker asChild onChange={onIconSelect}>
+                            <Button className="text-muted-foreground text-xs" variant="outline" size="sm">
+                                <Smile className="h-4 w-4 mr-2" />
+                                Добавить иконку
+                            </Button>
+                        </IconPicker>
+                    )
+                }
+                {
+                    !coverImage.url && !preview && (
+                        <Button onClick={coverImage.onOpen} className="text-muted-foreground text-xs" variant="outline" size="sm">
+                            <ImageIcon className="h-4 w-4 mr-2"/>
+                            Добавить обложку
+                        </Button>
+                    )
+                }
+            </div>
             {
                 isEditing && !preview ? (
                     <TextareaAutosize 

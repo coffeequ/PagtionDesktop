@@ -12,9 +12,9 @@ import ModalProvider from './providers/modal-providers.tsx'
 createRoot(document.getElementById('root')!).render(
   <ThemeProvider>
     <Toaster position="bottom-center"/>
-    <ModalProvider/>
     <StrictMode>
       <HashRouter>
+      <ModalProvider/>
         <Routes>
           <Route path='/login' element={<Login/>}></Route>
           <Route path='/document' element={<DocumentPage/>}>

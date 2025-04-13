@@ -69,7 +69,7 @@ if (!gotTheLock) {
 
       const parsedUrl = new URL(deepLink);
 
-      console.log(parsedUrl);
+      //console.log(parsedUrl);
 
       const user: IUser = {
         id: parsedUrl.searchParams.get("id")!,
@@ -78,7 +78,7 @@ if (!gotTheLock) {
         image: parsedUrl.searchParams.get("image")!
       }
 
-      console.log("полученный user: ");
+      //console.log("полученный user: ");
       
       if (mainWindow) {
 

@@ -39,14 +39,14 @@ export default function TrashBox(){
         const fetchData = async () => {
             //@ts-ignore
             const data = await window.electronAPI.trashNote(user.id);
-            console.log("trash-data: ", data);
+            // console.log("trash-data: ", data);
             setDocuments(data);
         }
         fetchData();
     }, [updateTrash]);
 
     const filtredDocuments = documents.filter((document: INote) => {
-        console.log("notes-filters: ", document);
+        // console.log("notes-filters: ", document);
         return document.title.toLowerCase().includes(search.toLowerCase());
     });
 

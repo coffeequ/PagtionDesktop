@@ -20,6 +20,10 @@ export class Note{
     isArchived: boolean = false;
 
     parentDocumentId: string | undefined = "";
+
+    icon: string | undefined;
+
+    coverImage: string | undefined;
     
     isPublished: boolean | undefined = false;
 

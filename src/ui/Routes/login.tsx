@@ -12,7 +12,6 @@ export default function login() {
     //@ts-ignore
     //window.electronAPI.syncDeepLinkGoogle();
     let user = GetUser();
-    console.log("user: ");
     if(user){
       navigate("/document/startPage");
     }
