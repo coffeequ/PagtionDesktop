@@ -49,9 +49,9 @@ export default function Item( {id, label, onClick, icon:Icon, active, expanded, 
         });
         toast.promise(promise, {
             loading: "Перемещение в мусорку...",
-            success: "Удаление произошло успешно!",
-            error: "Ошибка перемещения в мусорку."
-        });
+            success: "Страница была перемещена в корзину!",
+            error: "Перемещение не удалось."
+        })
     }
 
     function handleExpand(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {

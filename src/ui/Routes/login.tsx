@@ -9,8 +9,6 @@ export default function login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    //@ts-ignore
-    //window.electronAPI.syncDeepLinkGoogle();
     let user = GetUser();
     if(user){
       navigate("/document/startPage");

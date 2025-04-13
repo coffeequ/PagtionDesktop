@@ -27,7 +27,11 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+    () => {
+      //@ts-ignore
+      window.electronAPI.setTheme(localStorage.getItem(storageKey));
+      return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
+    }
   )
 
   useEffect(() => {
@@ -39,10 +43,13 @@ export function ThemeProvider({
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
         .matches
         ? "dark"
-        : "light"
+        : "light";
 
-      root.classList.add(systemTheme)
-      return
+
+      root.classList.add(systemTheme);
+      //@ts-ignore
+      window.electronAPI.setTheme(theme);
+      return;
     }
 
     root.classList.add(theme)
@@ -51,10 +58,10 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
+      localStorage.setItem(storageKey, theme)
       //@ts-ignore
       window.electronAPI.setTheme(theme);
+      setTheme(theme)
     },
   }
 

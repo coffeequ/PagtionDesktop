@@ -1,4 +1,4 @@
-import { Computer, Moon, Sun } from "lucide-react"
+import { Moon, Sun } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -34,12 +34,12 @@ export function ModeToggle() {
           <Moon/>
           Темная
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => {
+        {/* <DropdownMenuItem onClick={() => {
             setTheme("system");
         }}>
           <Computer/>
           Системная
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
       </DropdownMenuContent>
     </DropdownMenu>
   )

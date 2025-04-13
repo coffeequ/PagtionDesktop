@@ -28,6 +28,8 @@ function createMainWindow(){
 
   mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "login"});
 
+  mainWindow.focus();
+
   mainWindow.menuBarVisible = false;
 }
 
@@ -42,6 +44,9 @@ app.whenReady().then(async () => {
 //Создание кастомного протокола на macOS
 app.setAsDefaultProtocolClient("pagtion");
 
+function toggleTheme(theme: Theme){
+  nativeTheme.themeSource = theme
+}
 //Завершение работы приложение
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
@@ -54,8 +59,8 @@ ipcMain.handle("openAuth", (event, provider: string) => {
 
 //Смена темы
 ipcMain.handle("ToggleTheme", (event, theme: Theme) => {
-  nativeTheme.themeSource = theme;
-})
+  toggleTheme(theme);
+});
 
 //Не допускать открытие нового окна и передача данные из окна браузера
 const gotTheLock = app.requestSingleInstanceLock();
