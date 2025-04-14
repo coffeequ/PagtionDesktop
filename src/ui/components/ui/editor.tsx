@@ -1,16 +1,25 @@
 
 import{
-    BlockNoteEditor,
+    BlockNoteSchema,
+    combineByGroup,
+    filterSuggestionItems,
     PartialBlock,
 } from "@blocknote/core";
-import { useCreateBlockNote } from "@blocknote/react"
+import { getDefaultReactSlashMenuItems, SuggestionMenuController, useCreateBlockNote } from "@blocknote/react"
 import { BlockNoteView } from "@blocknote/mantine"
-import { ru } from "@blocknote/core/locales"
+import * as locales from "@blocknote/core/locales"
 
 import "@blocknote/mantine/style.css"
 
+import {
+    getMultiColumnSlashMenuItems,
+    multiColumnDropCursor,
+    locales as multiColumnLocales,
+    withMultiColumn,
+} from "@blocknote/xl-multi-column";
+
 import { useDebounceCallback } from "usehooks-ts";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useTheme } from "@/providers/theme-providers";
 
 
@@ -34,11 +43,28 @@ function Editor({ onChange, initialContent, editable } : IEditorProps){
         return window.electronAPI.handleUploadFile({name, arrayBuffer});
     }
 
-    const editor: BlockNoteEditor = useCreateBlockNote({
+    const editor = useCreateBlockNote({
+        schema: withMultiColumn(BlockNoteSchema.create()),
+        dropCursor: multiColumnDropCursor,
+        dictionary: {
+            ...locales.ru,
+            multi_column: multiColumnLocales.ru,
+        },
         initialContent: initialContent ? JSON.parse(initialContent) as PartialBlock[] : undefined,
-        dictionary: ru,
         uploadFile: handeUpload
     });
+
+    const getSlashMenuItems = useMemo(() => {
+        return async (query: string) =>
+          filterSuggestionItems(
+            combineByGroup(
+              getDefaultReactSlashMenuItems(editor),
+              getMultiColumnSlashMenuItems(editor)
+            ),
+            query
+          );
+    }, [editor]);
+
 
    useEffect(() => {
     editor.onChange(() => {debouncedOnChange(JSON.stringify(editor.document, null, 2))});
@@ -47,7 +73,7 @@ function Editor({ onChange, initialContent, editable } : IEditorProps){
     return(
         <div>
             <BlockNoteView editor={editor} theme={ theme === "dark" ? "dark" : "light" } editable = {editable}>
-
+                <SuggestionMenuController triggerCharacter={"/"} getItems={getSlashMenuItems} />
             </BlockNoteView>
         </div>
     );
