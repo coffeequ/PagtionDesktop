@@ -4,6 +4,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
    handleOpenProvirder: (provider: string) => {
     ipcRenderer.invoke("openAuth", provider);
    },
+   handleOpenRegister: () => {
+      ipcRenderer.invoke("openRegister");
+   },
+   handleOpenReset: () => {
+      ipcRenderer.invoke("openResetPassword");
+   },
    syncDeepLinkGoogle: (callback: any) => {
       ipcRenderer.on("deep-link", callback);
    },

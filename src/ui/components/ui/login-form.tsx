@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "./input"
 import { useForm } from "react-hook-form";
 import { LoginSchema } from "@/shemas";
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { FormError } from "./form-error"
 import { FormSucces } from "./form-success"
 import { useState } from "react"
@@ -69,7 +69,7 @@ export default function LoginForm(){
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmitForms)} className="space-y-6">
                     <div className="space-y-4">
-                        <FormField control={form.control} name="email" render={({ field }) => (
+                    <FormField control={form.control} name="email" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>
                                     Почта
@@ -77,7 +77,6 @@ export default function LoginForm(){
                                 <FormControl>
                                     <Input
                                     {...field}
-                                    
                                     placeholder="example@mail.ru"
                                     type="email"
                                     />
@@ -93,11 +92,18 @@ export default function LoginForm(){
                                 <FormControl>
                                     <Input
                                     {...field}
-                                   
                                     placeholder="123"
                                     type="password"
                                     />
                                 </FormControl>
+                                <Button size="sm" variant="link" asChild className="px-0 font-normal justify-start" onClick={() => {
+                                    //@ts-ignore
+                                    window.electronAPI.handleOpenReset()
+                                }}>
+                                    <Link to="">
+                                        Забыл пароль
+                                    </Link>
+                                </Button>
                                 <FormMessage/>
                             </FormItem>
                         )} />
@@ -109,7 +115,14 @@ export default function LoginForm(){
                     </Button>
                 </form>
             </Form>
-            
+            <div className="flex justify-center mt-2">
+                <Button variant="link" onClick={() => {
+                    //@ts-ignore
+                    window.electronAPI.handleOpenRegister()
+                }}>
+                    Нет аккаунта? Попробуйте создать его!
+                </Button>
+            </div>
             <hr className="w-48 h-1 mx-auto my-2 bg-gray-200 border-0 rounded-sm md:my-4 dark:bg-gray-500"/>
             <Button variant="ghost" className="mt-2" onClick={() =>{
                 //@ts-ignore

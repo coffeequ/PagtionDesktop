@@ -12,9 +12,11 @@ import { INote } from "@/interfaces/INote";
 interface DocumentListProps{
     parentDocumentId?: string;
     level?: number;
+    collapse: () => void;
+    isMobile: boolean
 }
 
-export default function DocumentList({ parentDocumentId, level = 0} : DocumentListProps) {
+export default function DocumentList({ parentDocumentId, level = 0, collapse, isMobile } : DocumentListProps) {
 
     const shouldRefresh = useRefreshStore((state) => state.shouldRefresh);
 
@@ -53,6 +55,9 @@ export default function DocumentList({ parentDocumentId, level = 0} : DocumentLi
     } 
 
     function onRedirect(documentId: string){
+        if(isMobile){
+            collapse();
+        }
         navigate(`/document/${documentId}`);
     }
 
@@ -99,6 +104,8 @@ export default function DocumentList({ parentDocumentId, level = 0} : DocumentLi
                                 <DocumentList
                                     parentDocumentId={document.noteId}
                                     level={level + 1}
+                                    collapse={collapse}
+                                    isMobile={isMobile}
                                 />
                             )
                         }

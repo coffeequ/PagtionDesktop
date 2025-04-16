@@ -57,6 +57,15 @@ ipcMain.handle("openAuth", (event, provider: string) => {
   shell.openExternal(`https://pagtion.vercel.app/electronRedirectOauth?selectProviders=${provider}`);
 })
 
+ipcMain.handle("openRegister", () => {
+  shell.openExternal(`https://pagtion.vercel.app/register`);
+})
+
+ipcMain.handle("openResetPassword", () => {
+  shell.openExternal(`https://pagtion.vercel.app/reset`);
+})
+
+
 //Смена темы
 ipcMain.handle("ToggleTheme", (event, theme: Theme) => {
   toggleTheme(theme);
