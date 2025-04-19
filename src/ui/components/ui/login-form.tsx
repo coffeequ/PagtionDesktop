@@ -16,12 +16,13 @@ import { LoginSchema } from "@/shemas";
 import { Link, useNavigate } from "react-router-dom"
 import { FormError } from "./form-error"
 import { FormSucces } from "./form-success"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 
 export default function LoginForm(){
 
     const navigate = useNavigate();
 
+    const [isPading, startTransition] = useTransition();
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
 
@@ -33,35 +34,38 @@ export default function LoginForm(){
         }
     });
 
-    const handleSubmitForms = async (values: z.infer<typeof LoginSchema>) => {
+    const handleSubmitForms = (values: z.infer<typeof LoginSchema>) => {
         setError("");
         setSuccess("");
-        const email = values.email;
-        const password = values.password;
 
-        try {
-            const response = await fetch('https://pagtion.vercel.app/api/authenticate', {
-                    method: 'POST',
-                    headers: {
-                            'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email, password
-                    }),
-                });
-            if(response.ok) {
-                response.json().then((item) => {
-                window.localStorage.setItem("user", JSON.stringify(item));
-                setSuccess("Авторизация прошла успешно!");
-                navigate("/document/startPage");});
-            return;
-          } else {
-            setError("Произошла ошибка авторизации");
-            return;
-          }
-        } catch (error: any) {
-            setError("Упс... Произошла ошибка авторизации");
-        }
+        startTransition(async () => {
+            const email = values.email;
+            const password = values.password;
+    
+            try {
+                const response = await fetch('https://pagtion.vercel.app/api/authenticate', {
+                        method: 'POST',
+                        headers: {
+                                'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            email, password
+                        }),
+                    });
+                if(response.ok) {
+                    response.json().then((item) => {
+                    window.localStorage.setItem("user", JSON.stringify(item));
+                    setSuccess("Авторизация прошла успешно!");
+                    navigate("/document/startPage");});
+                return;
+              } else {
+                setError("Произошла ошибка авторизации");
+                return;
+              }
+            } catch (error: any) {
+                setError("Упс... Произошла ошибка авторизации");
+            }  
+        })
     };
 
     return (
@@ -79,6 +83,7 @@ export default function LoginForm(){
                                     {...field}
                                     placeholder="example@mail.ru"
                                     type="email"
+                                    disabled={isPading}
                                     />
                                 </FormControl>
                                 <FormMessage/>
@@ -94,6 +99,7 @@ export default function LoginForm(){
                                     {...field}
                                     placeholder="123"
                                     type="password"
+                                    disabled={isPading}
                                     />
                                 </FormControl>
                                 <Button size="sm" variant="link" asChild className="px-0 font-normal justify-start" onClick={() => {

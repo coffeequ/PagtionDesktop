@@ -8,7 +8,7 @@ import { DirectoryFile } from './classes/DirectoryFiles.js';
 import { IUser } from './interfaces/IUser.js';
 
 
-type Theme = "dark" | "light" | "system";
+type Theme = "dark" | "light";
 
 //Remind: В продакшене использовать две .., в дев .
 let mainWindow: BrowserWindow;
@@ -65,13 +65,12 @@ ipcMain.handle("openResetPassword", () => {
   shell.openExternal(`https://pagtion.vercel.app/reset`);
 })
 
-
 //Смена темы
 ipcMain.handle("ToggleTheme", (event, theme: Theme) => {
   toggleTheme(theme);
 });
 
-//Не допускать открытие нового окна и передача данные из окна браузера
+//Не допускать открытие нового окна. Передача данные из окна браузера
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();

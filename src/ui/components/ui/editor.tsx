@@ -7,7 +7,7 @@ import{
 } from "@blocknote/core";
 import { getDefaultReactSlashMenuItems, SuggestionMenuController, useCreateBlockNote } from "@blocknote/react"
 import { BlockNoteView } from "@blocknote/mantine"
-import * as locales from "@blocknote/core/locales"
+import { ru } from "@blocknote/core/locales"
 
 import "@blocknote/mantine/style.css"
 
@@ -47,7 +47,7 @@ function Editor({ onChange, initialContent, editable } : IEditorProps){
         schema: withMultiColumn(BlockNoteSchema.create()),
         dropCursor: multiColumnDropCursor,
         dictionary: {
-            ...locales.ru,
+            ...ru,
             multi_column: multiColumnLocales.ru,
         },
         initialContent: initialContent ? JSON.parse(initialContent) as PartialBlock[] : undefined,
