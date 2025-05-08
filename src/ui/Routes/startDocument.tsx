@@ -1,3 +1,4 @@
+import { GetUser } from "@/actions/user";
 import { Button } from "@/components/ui/button";
 import useRefreshStore from "@/hooks/use-refresh";
 import { INote } from "@/interfaces/INote";
@@ -13,20 +14,18 @@ interface IUser {
 }
 
 export default function StartDocumentPage() {
+
     const navigate = useNavigate();
 
     const { triggerRefresh } = useRefreshStore();
 
-    const getUser = localStorage.getItem("user");
+    const user: IUser = GetUser();
 
-    const user: IUser = JSON.parse(getUser as string);
-    
     async function onCreate(){
         if(!user){
             throw new Error("Не найден id пользователя!");
         }
 
-        //Почему-то в консоль браузера выводится undefined
         //@ts-ignore
         const newNote = window.electronAPI.createNote("Untitled", user.id, undefined).then((item) => {
             const result: INote = item

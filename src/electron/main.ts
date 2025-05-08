@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain, nativeTheme } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, nativeTheme, net } from 'electron';
 import path from 'path';
 import { DirectoryNotes } from './classes/DirectoryNotes.js';
 import { Note } from './classes/Note.js';
@@ -6,6 +6,7 @@ import { IUpdateProps } from './interfaces/IUpdateNote.js';
 import { IFilesUpload } from './interfaces/IFilesUpload.js';
 import { DirectoryFile } from './classes/DirectoryFiles.js';
 import { IUser } from './interfaces/IUser.js';
+import { UserData } from "./classes/DirectoryUserData.js"
 
 
 type Theme = "dark" | "light";
@@ -15,6 +16,7 @@ let mainWindow: BrowserWindow;
 
 let directoryNotes = new DirectoryNotes();
 let directoryFile = new DirectoryFile();
+let directoryUserData = new UserData();
 
 //Главное окно приложения
 function createMainWindow(){
@@ -33,11 +35,15 @@ function createMainWindow(){
   mainWindow.menuBarVisible = false;
 }
 
-//Создание окна при полной загрузки приложения
+//Создание окна при загрузки приложения
 app.whenReady().then(async () => {
+  //const fetchData = await net.fetch("http://localhost:3000/api/testDocuments");
+  //const data: Note[] = await fetchData.json();
   directoryFile.createFolder();
   directoryFile.readNameFiles();
   directoryNotes.readNotesDirectory();
+  const result = directoryUserData.readUserFile();
+  console.log(result);
   createMainWindow();
 });
 
@@ -70,7 +76,7 @@ ipcMain.handle("ToggleTheme", (event, theme: Theme) => {
   toggleTheme(theme);
 });
 
-//Не допускать открытие нового окна. Передача данные из окна браузера
+//Не допускать открытие нового окна. Передача данных из окна браузера
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
@@ -90,8 +96,6 @@ if (!gotTheLock) {
         name: parsedUrl.searchParams.get("name")!,
         image: parsedUrl.searchParams.get("image")!
       }
-
-      //console.log("полученный user: ");
       
       if (mainWindow) {
 
@@ -188,3 +192,7 @@ ipcMain.handle("path-notes", () => {
 ipcMain.handle("path-files", () => {
   return directoryFile.GetFolderFilesPath();
 });
+
+ipcMain.handle("save-user-data", async (event, user: IUser) => {
+  return directoryUserData.saveUserFile(user)
+})

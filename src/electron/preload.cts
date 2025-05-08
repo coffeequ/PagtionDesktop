@@ -62,6 +62,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
    },
    GetFilePath: () => {
       return ipcRenderer.invoke("path-files");
+   },
+   SaveUserData: (user: any) => {
+      return ipcRenderer.invoke("save-user-data", user);
    }
 });
 

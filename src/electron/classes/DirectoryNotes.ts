@@ -142,7 +142,6 @@ export class DirectoryNotes{
       }
     }
     
-    
     async sidebar(userId: string, parentDocumentId: string){
       const resultArr = [];
       for (let i = 0; i < this.notes.length; i++) {
@@ -199,5 +198,11 @@ export class DirectoryNotes{
       }
      }
      return resultArr.filter((item) => item.title);
+    }
+
+    async existsNote(notesFromBrowser: Note[]){
+      notesFromBrowser.forEach((item) => {
+        this.updateMap.has(item.noteId)
+      })
     }
 }
