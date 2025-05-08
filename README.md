@@ -1,4 +1,34 @@
-# React + TypeScript + Vite
+
+### Для работы нужно склонировать репозиторий
+```
+  git clone https://github.com/coffeequ/PagtionDesktop
+```
+### Установка зависимостей
+```
+  npm install
+```
+
+### Сборка для разработки в десктоп - electron
+```
+  npm run dev:electron
+```
+
+### Сборка для разработки в браузере - react
+```
+  npm run dev:react
+```
+
+### Билд проекта под разные ОС
+```
+  npm run dist:mac // не проверено
+  npm run dist:win // проверно - работает
+  npm run dist:linux // не проверено
+```
+
+### Или просто [скачать последнюю актуальную версию] (https://github.com/coffeequ/PagtionDesktop/releases/tag/v0.0.4)
+
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -50,5 +80,23 @@ export default tseslint.config({
     ...reactX.configs['recommended-typescript'].rules,
     ...reactDom.configs.recommended.rules,
   },
+})
+```
+
+```ts
+//vite.config.ts
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  base: "./",
+  build: {
+    outDir: 'dist-react',
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src/ui"),
+    }
+  }
 })
 ```
