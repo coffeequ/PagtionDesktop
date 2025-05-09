@@ -43,10 +43,10 @@ export default function LoginForm(){
             const password = values.password;
     
             try {
-                const response = await fetch('https://pagtion.vercel.app/api/authenticate', {
+                const response = await fetch('http://localhost:3000/api/authenticate', {
                         method: 'POST',
                         headers: {
-                                'Content-Type': 'application/json',
+                            'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
                             email, password
@@ -59,12 +59,16 @@ export default function LoginForm(){
                     window.electronAPI.SaveUserData(item);
                     setSuccess("Авторизация прошла успешно!");
                     navigate("/document/startPage");});
-                return;
-              } else {
-                setError("Произошла ошибка авторизации");
-                return;
+                    return;
+                } else {
+                    const fetchData = async () =>{
+                        const data = await response.json();
+                        setError(data.error);
+                    }
+                    fetchData();
+                    return;
               }
-            } catch (error: any) {
+            } catch {
                 setError("Упс... Произошла ошибка авторизации");
             }  
         })

@@ -98,12 +98,15 @@ if (!gotTheLock) {
       }
       
       if (mainWindow) {
-
+        
         mainWindow.webContents.send("deep-link", user);
         
         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
         
         mainWindow.isFocused();
+        
+        directoryUserData.saveUserFile(user);
+
       }
     }
   });
@@ -120,6 +123,7 @@ app.on("open-url", (event, url) => {
     image: parsedUrl.searchParams.get("image")!
   }
   if(mainWindow){
+    directoryUserData.saveUserFile(user);
     mainWindow.webContents.send("deep-link", user);
     mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
     mainWindow.isFocused();    
@@ -193,6 +197,6 @@ ipcMain.handle("path-files", () => {
   return directoryFile.GetFolderFilesPath();
 });
 
-ipcMain.handle("save-user-data", async (event, user: IUser) => {
+ipcMain.handle("save-user-data", async (event, user: UserData) => {
   return directoryUserData.saveUserFile(user)
 })
