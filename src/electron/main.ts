@@ -7,6 +7,7 @@ import { IFilesUpload } from './interfaces/IFilesUpload.js';
 import { DirectoryFile } from './classes/DirectoryFiles.js';
 import { IUser } from './interfaces/IUser.js';
 import { UserData } from "./classes/DirectoryUserData.js"
+import { DirectoryLO } from './classes/ListOperation.js';
 
 
 type Theme = "dark" | "light";
@@ -17,6 +18,7 @@ let mainWindow: BrowserWindow;
 let directoryNotes = new DirectoryNotes();
 let directoryFile = new DirectoryFile();
 let directoryUserData = new UserData();
+let directoryLO = new DirectoryLO();
 
 //Главное окно приложения
 function createMainWindow(){
@@ -42,8 +44,8 @@ app.whenReady().then(async () => {
   directoryFile.createFolder();
   directoryFile.readNameFiles();
   directoryNotes.readNotesDirectory();
-  const result = directoryUserData.readUserFile();
-  console.log(result);
+  directoryLO.createListOpearion();
+  directoryLO.readOperation();
   createMainWindow();
 });
 

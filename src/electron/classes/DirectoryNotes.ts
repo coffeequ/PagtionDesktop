@@ -3,6 +3,8 @@ import { existsSync, mkdirSync, promises, readFile, unlink, writeFile } from "fs
 import path from "path";
 import { Note } from "./Note.js";
 import { IUpdateProps } from "../interfaces/IUpdateNote.js";
+import { DirectoryLO } from "./ListOperation.js";
+import { Operation } from "./Operation.js";
 
 export class DirectoryNotes{
     
@@ -20,7 +22,9 @@ export class DirectoryNotes{
       this._notes = v;
     }
 
-    updateMap = new Map();
+    private updateMap = new Map();
+
+    private listOP: DirectoryLO = new DirectoryLO();
 
     private readFilePromise(filePath: string): Promise<string> {
         return new Promise((resolve, reject) => {
@@ -64,6 +68,7 @@ export class DirectoryNotes{
           } else {
             //console.log("createNote: ", note);
             this.notes.push(note);
+            this.listOP.writeOperation(new Operation("PUT", note.noteId, note.userId, note.content, new Date()));
             this.updateMap.set(note.noteId, note);
             resolve(note);
           }
@@ -86,6 +91,7 @@ export class DirectoryNotes{
             }
             const [deleteNote] = this.notes.splice(indexDelete, 1); 
             // console.log("Delete note: ", [deleteNote]);
+            this.listOP.writeOperation(new Operation("DEL", deleteNote.noteId, deleteNote.userId, deleteNote.content, new Date()));
             this.updateMap.delete(deleteNote.noteId);
             resolve(deleteNote);
           }
@@ -165,6 +171,7 @@ export class DirectoryNotes{
         if(coverImage !== undefined) item.coverImage = coverImage;
         item.isPublished = isPublished;
         await this.editNoteDirectory(item);
+        this.listOP.writeOperation(new Operation("PUT", item.noteId, item.userId ,item.content, new Date()));
         return;
       }
       else{
