@@ -1,6 +1,6 @@
 export interface INote{
     userId: string;
-    noteId : string;
+    id : string;
     content: string;
     title: string;
     isArchived: boolean; 

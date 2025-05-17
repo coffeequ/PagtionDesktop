@@ -82,7 +82,7 @@ export default function SearchCommand(){
                 {
                         documents?.map((document) => (
                             // value={`${document._id} - ${document.title}`}
-                            <CommandItem key = {document.noteId} value={`${document.noteId} - ${document.title}`} title={document.title} onSelect={onSelect}>
+                            <CommandItem key = {document.id} value={`${document.id} - ${document.title}`} title={document.title} onSelect={onSelect}>
                                 {
                                     document.icon ? (
                                         <p className="mr-2 text-[18px]">

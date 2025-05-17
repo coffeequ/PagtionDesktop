@@ -202,3 +202,15 @@ ipcMain.handle("path-files", () => {
 ipcMain.handle("save-user-data", async (event, user: UserData) => {
   return directoryUserData.saveUserFile(user)
 })
+
+// ipcMain.handle("get-current-status-sync", () => {
+//   return directoryLO.GetCurrentStatus();
+// });
+
+ipcMain.handle("start-sync", () => {
+  return directoryLO.startSendOperation();
+});
+
+ipcMain.handle("stop-sync", () => {
+  return directoryLO.stopSendOperation();
+});

@@ -75,13 +75,13 @@ export default function Navbar({ isCollapsed, onResetWidth } : NavbarProps) {
                     {/* <Title initialData = {document}/> */}
                     <div className="flex items-center gap-x-2">
                         <Publish initialData = {document} refresh={refresh} />
-                        <Menu documentId = {document.noteId} />
+                        <Menu documentId = {document.id} />
                     </div>
                 </div>
             </nav>
             {
                 document.isArchived && (
-                    <Banner documentId = {document.noteId} />
+                    <Banner documentId = {document.id} />
                 )
             }
         </>

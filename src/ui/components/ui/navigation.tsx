@@ -121,7 +121,7 @@ export default function Navigation(){
         const newNote = window.electronAPI.createNote("Untitled", user.id, undefined).then((item) => {
             const result: INote = item
             triggerRefresh();
-            navigate(`/document/${result.noteId}`);
+            navigate(`/document/${result.id}`);
         });
 
         toast.promise(newNote, {

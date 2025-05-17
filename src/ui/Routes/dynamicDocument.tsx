@@ -79,9 +79,9 @@ export default function DocumentIdPage(){
         <div className="pb-40 dark:bg-[#1F1F1F]">
             <Cover key={url} url={url} />
             <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
-                <Toolbar key={ document.noteId } initialData = { document } onTitleChange={onChangeTitle} />
+                <Toolbar key={ document.id } initialData = { document } onTitleChange={onChangeTitle} />
                 <Suspense fallback={<Spinner/>}>
-                    <Editor key={ document.noteId } onChange={onChangeContent} initialContent={document.content} />
+                    <Editor key={ document.id } onChange={onChangeContent} initialContent={document.content} />
                 </Suspense>
             </div>
         </div> 

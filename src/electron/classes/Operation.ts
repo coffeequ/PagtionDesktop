@@ -1,20 +1,18 @@
+import { Note } from "./Note.js";
+
 export class Operation{
     
-    typeOperation: "DEL" | "PUT" | "POST";
-
-    noteId: string;
-
-    userId: string;
+    typeOperation: "DELETE" | "PUT" | "POST";
 
     data: string | undefined;
 
     dateAt: Date;
 
-    constructor(typeOperation: "DEL" | "PUT" | "POST", noteId: string, userId: string, data: string | undefined, dateAt: Date) {
+    note: Note;
+
+    constructor(typeOperation: "DELETE" | "PUT" | "POST", note: Note, dateAt: Date) {
         this.typeOperation = typeOperation;
-        this.noteId = noteId;
-        this.userId = userId;
-        this.data = data;
+        this.note = note;
         this.dateAt = dateAt;
     }
 }

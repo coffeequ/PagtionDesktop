@@ -17,6 +17,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { FormError } from "./form-error"
 import { FormSucces } from "./form-success"
 import { useState, useTransition } from "react"
+import { SetStatusSync } from "@/actions/statusSync"
 
 export default function LoginForm(){
 
@@ -55,6 +56,7 @@ export default function LoginForm(){
                 if(response.ok) {
                     response.json().then((item) => {
                     window.localStorage.setItem("user", JSON.stringify(item));
+                    SetStatusSync(false);
                     //@ts-ignore
                     window.electronAPI.SaveUserData(item);
                     setSuccess("Авторизация прошла успешно!");
