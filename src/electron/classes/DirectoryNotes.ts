@@ -5,6 +5,7 @@ import { Note } from "./Note.js";
 import { IUpdateProps } from "../interfaces/IUpdateNote.js";
 import { DirectoryLO } from "./ListOperation.js";
 import { Operation } from "./Operation.js";
+import { TypeOperations } from "../enums/TypeOperation.js";
 
 export class DirectoryNotes{
     
@@ -68,7 +69,7 @@ export class DirectoryNotes{
           } else {
             //console.log("createNote: ", note);
             this.notes.push(note);
-            this.listOP.writeOperation(new Operation("POST", note, new Date()));
+            this.listOP.writeOperation(new Operation(note, new Date(), TypeOperations.POST));
             this.updateMap.set(note.id, note);
             resolve(note);
           }
@@ -91,7 +92,7 @@ export class DirectoryNotes{
             }
             const [deleteNote] = this.notes.splice(indexDelete, 1); 
             // console.log("Delete note: ", [deleteNote]);
-            this.listOP.writeOperation(new Operation("DELETE", deleteNote, new Date()));
+            this.listOP.writeOperation(new Operation(deleteNote, new Date(), TypeOperations.DELETE));
             this.updateMap.delete(deleteNote.id);
             resolve(deleteNote);
           }
@@ -171,7 +172,7 @@ export class DirectoryNotes{
         if(coverImage !== undefined) item.coverImage = coverImage;
         item.isPublished = isPublished;
         await this.editNoteDirectory(item);
-        this.listOP.writeOperation(new Operation("PUT", item as Note, new Date()));
+        this.listOP.writeOperation(new Operation(item as Note, new Date(), TypeOperations.PUT));
         return;
       }
       else{

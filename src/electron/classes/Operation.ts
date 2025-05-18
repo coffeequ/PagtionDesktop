@@ -1,8 +1,9 @@
+import { TypeOperations } from "../enums/TypeOperation.js";
 import { Note } from "./Note.js";
 
 export class Operation{
-    
-    typeOperation: "DELETE" | "PUT" | "POST";
+
+    typeOperation: TypeOperations;
 
     data: string | undefined;
 
@@ -10,7 +11,7 @@ export class Operation{
 
     note: Note;
 
-    constructor(typeOperation: "DELETE" | "PUT" | "POST", note: Note, dateAt: Date) {
+    constructor(note: Note, dateAt: Date, typeOperation: TypeOperations) {
         this.typeOperation = typeOperation;
         this.note = note;
         this.dateAt = dateAt;

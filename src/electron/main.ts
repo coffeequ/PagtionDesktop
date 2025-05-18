@@ -39,13 +39,19 @@ function createMainWindow(){
 
 //Создание окна при загрузки приложения
 app.whenReady().then(async () => {
-  //const fetchData = await net.fetch("http://localhost:3000/api/testDocuments");
-  //const data: Note[] = await fetchData.json();
+  
+  //Чтение файлов
   directoryFile.createFolder();
   directoryFile.readNameFiles();
+  
+  //Чтение заметок
   directoryNotes.readNotesDirectory();
+  
+  //Чтение очереди операций для синхронизации между устройствами
   directoryLO.createListOpearion();
   directoryLO.readOperation();
+  
+  //Запуск основого окна
   createMainWindow();
 });
 

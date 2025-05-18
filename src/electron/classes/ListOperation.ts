@@ -3,14 +3,14 @@ import { existsSync, mkdirSync, readFile, writeFile } from "fs";
 import path from "path";
 import { Operation } from "./Operation.js";
 import { promisify } from "util";
+import { IOperationQueue } from "../interfaces/IOperationQueue.js";
+import { TypeOperations } from "../enums/TypeOperation.js";
 
 export class DirectoryLO{
 
     //TODO: Сделать хеш-мапу для операций. То есть, если допустим была операция добавления и затем удаления
     // одной и той же заметки в целях экономии ресурсов, будет менять её состояние, а не сначала делать операцию по сохранению, 
     // а затем удаления
-    
-    // syncStatus: boolean = false;
 
     private userPath: string = app.getPath("userData");
 
@@ -20,23 +20,27 @@ export class DirectoryLO{
 
     private filePath = `${this.folderPath}/${this.fileName}.json`;
 
-    arrSendOP: Operation[] = [];
-
-    private readFileAsync = promisify(readFile);
-
     private timer: NodeJS.Timeout | null = null;
+
+    //0 - POST, 1 - PUT, 2 - DELETE
+    private operationQueue: IOperationQueue = {
+        [TypeOperations.POST]: [],
+        [TypeOperations.PUT]: [],
+        [TypeOperations.DELETE]: []
+    };
 
     private handleFetchData = async (operation: Operation) => {
         const res = await net.fetch("http://localhost:3000/api/testDocuments", {
-            method: operation.typeOperation,
+            method: operation.typeOperation.toString(),
             headers: {
                 "Content-Type": "Application/json"
             },
             body: JSON.stringify(operation.note)
         });
-        return res.status;
+        console.log(res.status);
     }
 
+    //Метод для создания файла очереди операций
     createListOpearion(){
         console.log("Метод сработал");
         if(!existsSync(this.folderPath)){
@@ -49,9 +53,13 @@ export class DirectoryLO{
         }
     }
 
+    //Метод для записи операции в файл и очередь
     writeOperation(operation: Operation){
-        this.arrSendOP.push(operation);
-        const body = JSON.stringify(this.arrSendOP);
+
+        this.operationQueue[operation.typeOperation].push(operation);
+
+        const body = JSON.stringify(this.operationQueue);
+
         writeFile(this.filePath, body, (err) => {
             if(err){
                 throw new Error("Error write note!");
@@ -59,34 +67,52 @@ export class DirectoryLO{
         });
     }
 
+    //Метод для чтения очереди операций
     async readOperation(){
-        try {
-            const resRead = await this.readFileAsync(this.filePath, "utf-8");
-            this.arrSendOP = JSON.parse(resRead);
-        } catch {
-            throw new Error("Error read folder");
-        }
+         console.log("start read");
+            await readFile(this.filePath, "utf-8", (err, data) => {
+                if(err){
+                    this.operationQueue = {
+                        [TypeOperations.POST]: [],
+                        [TypeOperations.PUT]: [],
+                        [TypeOperations.DELETE]:[]
+                    }
+                    throw new Error("Error read data");
+                }
+                else{
+                    const body: IOperationQueue = JSON.parse(data)
+                    this.operationQueue = body
+                    console.log("body-reading: ", body);
+                }
+            });
+            console.log("after read queue: ", this.operationQueue);
     }
 
+    //Метод для отправки операций
     private async sendOperaionLoop(){
-            console.log("Timer working");
-            if(this.arrSendOP.length === 0){
-                console.log("arrSend - empty");
-                return;
-            }
-            else{
-                console.log("Timer working... Send opearion");
-                console.log(this.arrSendOP);
-                for(const item of this.arrSendOP){
-                    try {
-                        const status = await this.handleFetchData(item);
-                        console.log(status);
-                    } catch {
-                        throw new Error("Ошибка синхронизации");
-                    }
+        console.log("send this operation queue: ", this.operationQueue);
+        for(const typeOp of [TypeOperations.POST, TypeOperations.PUT, TypeOperations.DELETE]){
+            console.log("send typeOp: ", typeOp);
+            console.log("lenght: ", this.operationQueue[typeOp].length);
+            while(this.operationQueue[typeOp].length){
+                const op = this.operationQueue[typeOp].shift()!;
+                try {
+                    await this.handleFetchData(op);
+                } catch {
+                    this.operationQueue[typeOp].unshift(op);
+                    throw new Error("Error synchronization")
                 }
-                this.arrSendOP = [];
             }
+        }
+
+        const body = JSON.stringify(this.operationQueue);
+
+        writeFile(this.filePath, body, (err) => {
+            if(err){
+                throw new Error("Error save queue in file");
+            }
+        })
+
         this.timer = setTimeout(() => this.sendOperaionLoop(), 5000);
     }
 
