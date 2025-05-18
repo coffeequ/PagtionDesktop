@@ -68,7 +68,7 @@ export class DirectoryNotes{
           } else {
             //console.log("createNote: ", note);
             this.notes.push(note);
-            this.listOP.writeOperation(new Operation("PUT", note, new Date()));
+            this.listOP.writeOperation(new Operation("POST", note, new Date()));
             this.updateMap.set(note.id, note);
             resolve(note);
           }

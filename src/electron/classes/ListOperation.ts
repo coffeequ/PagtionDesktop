@@ -43,7 +43,7 @@ export class DirectoryLO{
             mkdirSync(this.folderPath, {recursive: true});
             writeFile(this.filePath, "", ((err) => {
             if(err){
-                throw new Error("Ошибка создания файла учета офлайн операций!");
+                throw new Error("Error of create list operation!");
             }
             }));
         }
@@ -54,7 +54,7 @@ export class DirectoryLO{
         const body = JSON.stringify(this.arrSendOP);
         writeFile(this.filePath, body, (err) => {
             if(err){
-                throw new Error("Ошибка чтения файла!");
+                throw new Error("Error write note!");
             }
         });
     }
@@ -76,6 +76,7 @@ export class DirectoryLO{
             }
             else{
                 console.log("Timer working... Send opearion");
+                console.log(this.arrSendOP);
                 for(const item of this.arrSendOP){
                     try {
                         const status = await this.handleFetchData(item);

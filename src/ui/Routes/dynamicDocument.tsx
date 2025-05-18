@@ -48,14 +48,14 @@ export default function DocumentIdPage(){
             title = "Untitled";
         }
         //@ts-ignore
-        await window.electronAPI.updateNote({noteId: id as string, title});
+        await window.electronAPI.updateNote({id: id as string, title});
         triggerRefresh();
     }, [id as string]);
 
     //Смена конента заметки
     const onChangeContent = useCallback(async (content: string) => {
         //@ts-ignore
-        await window.electronAPI.updateNote({noteId: id as string, content});
+        await window.electronAPI.updateNote({id: id as string, content});
         triggerRefresh();
     }, [id as string])
 
