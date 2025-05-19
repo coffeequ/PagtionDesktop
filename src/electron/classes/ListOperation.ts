@@ -29,23 +29,25 @@ export class DirectoryLO{
         [TypeOperations.DELETE]: []
     };
 
+    private readFileAsync = promisify(readFile);
+
     private handleFetchData = async (operation: Operation) => {
         const res = await net.fetch("http://localhost:3000/api/testDocuments", {
-            method: operation.typeOperation.toString(),
+            method: operation.typeOperation,
             headers: {
                 "Content-Type": "Application/json"
             },
             body: JSON.stringify(operation.note)
         });
-        console.log(res.status);
+        return res.ok;
     }
 
     //Метод для создания файла очереди операций
-    createListOpearion(){
-        console.log("Метод сработал");
+    createListOpearionFile(){
+        console.log("Method work!");
         if(!existsSync(this.folderPath)){
             mkdirSync(this.folderPath, {recursive: true});
-            writeFile(this.filePath, "", ((err) => {
+            writeFile(this.filePath, JSON.stringify(this.operationQueue), ((err) => {
             if(err){
                 throw new Error("Error of create list operation!");
             }
@@ -54,13 +56,13 @@ export class DirectoryLO{
     }
 
     //Метод для записи операции в файл и очередь
-    writeOperation(operation: Operation){
+    async writeOperationFile(operation: Operation){
 
         this.operationQueue[operation.typeOperation].push(operation);
 
         const body = JSON.stringify(this.operationQueue);
 
-        writeFile(this.filePath, body, (err) => {
+        await writeFile(this.filePath, body, (err) => {
             if(err){
                 throw new Error("Error write note!");
             }
@@ -68,39 +70,30 @@ export class DirectoryLO{
     }
 
     //Метод для чтения очереди операций
-    async readOperation(){
-         console.log("start read");
-            await readFile(this.filePath, "utf-8", (err, data) => {
-                if(err){
-                    this.operationQueue = {
-                        [TypeOperations.POST]: [],
-                        [TypeOperations.PUT]: [],
-                        [TypeOperations.DELETE]:[]
-                    }
-                    throw new Error("Error read data");
-                }
-                else{
-                    const body: IOperationQueue = JSON.parse(data)
-                    this.operationQueue = body
-                    console.log("body-reading: ", body);
-                }
-            });
-            console.log("after read queue: ", this.operationQueue);
+    async readOpeartionFile(){
+        try {
+            const data = await this.readFileAsync(this.filePath, "utf-8");
+            const parseData = JSON.parse(data);
+            this.operationQueue = parseData;
+        } catch {
+            throw new Error("Read file async");
+        }
     }
 
     //Метод для отправки операций
     private async sendOperaionLoop(){
-        console.log("send this operation queue: ", this.operationQueue);
+        await this.readOpeartionFile();
         for(const typeOp of [TypeOperations.POST, TypeOperations.PUT, TypeOperations.DELETE]){
             console.log("send typeOp: ", typeOp);
-            console.log("lenght: ", this.operationQueue[typeOp].length);
+            console.log("lenght: ", this.operationQueue[typeOp]);
             while(this.operationQueue[typeOp].length){
-                const op = this.operationQueue[typeOp].shift()!;
-                try {
-                    await this.handleFetchData(op);
-                } catch {
-                    this.operationQueue[typeOp].unshift(op);
-                    throw new Error("Error synchronization")
+                const op = this.operationQueue[typeOp].shift();
+                if(op){
+                    const res = await this.handleFetchData(op);
+                    if(!res){
+                        console.log("res: ", res);
+                        this.operationQueue[typeOp].unshift(op);
+                    }
                 }
             }
         }

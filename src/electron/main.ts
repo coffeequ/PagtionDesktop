@@ -48,8 +48,8 @@ app.whenReady().then(async () => {
   directoryNotes.readNotesDirectory();
   
   //Чтение очереди операций для синхронизации между устройствами
-  directoryLO.createListOpearion();
-  directoryLO.readOperation();
+  directoryLO.createListOpearionFile();
+  // directoryLO.readOperation();
   
   //Запуск основого окна
   createMainWindow();
