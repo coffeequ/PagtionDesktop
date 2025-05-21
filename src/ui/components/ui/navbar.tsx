@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { GetUser } from "@/actions/user";
 import { INote } from "@/interfaces/INote";
 import useRefreshStore from "@/hooks/use-refresh";
+import StatusSync from "./StatusSync";
 
 
 interface NavbarProps {
@@ -72,8 +73,8 @@ export default function Navbar({ isCollapsed, onResetWidth } : NavbarProps) {
                     )
                 }
                 <div className="flex items-center justify-end w-full">
-                    {/* <Title initialData = {document}/> */}
                     <div className="flex items-center gap-x-2">
+                        <StatusSync/>
                         <Publish initialData = {document} refresh={refresh} />
                         <Menu documentId = {document.id} />
                     </div>

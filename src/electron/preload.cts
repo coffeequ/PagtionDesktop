@@ -72,6 +72,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
    StopSend: () => {
       return ipcRenderer.invoke("stop-sync")
    },
+   GetIsStatusSync: () => {
+      return ipcRenderer.invoke("get-current-status-sync");
+   }
 });
 
 

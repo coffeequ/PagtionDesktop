@@ -16,4 +16,5 @@ export class Operation{
         this.note = note;
         this.dateAt = dateAt;
     }
+
 }

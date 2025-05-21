@@ -8,6 +8,13 @@ import { TypeOperations } from "../enums/TypeOperation.js";
 
 export class DirectoryLO{
 
+    /**
+     *Создание файла для записи очередей
+     */
+    constructor() {
+        this.createListOpearionFile();
+    }
+
     //TODO: Сделать хеш-мапу для операций. То есть, если допустим была операция добавления и затем удаления
     // одной и той же заметки в целях экономии ресурсов, будет менять её состояние, а не сначала делать операцию по сохранению, 
     // а затем удаления
@@ -22,6 +29,10 @@ export class DirectoryLO{
 
     private timer: NodeJS.Timeout | null = null;
 
+    private isStatusSend: boolean = false;
+
+    private isSync: boolean = true;
+
     //0 - POST, 1 - PUT, 2 - DELETE
     private operationQueue: IOperationQueue = {
         [TypeOperations.POST]: [],
@@ -30,6 +41,8 @@ export class DirectoryLO{
     };
 
     private readFileAsync = promisify(readFile);
+
+    private writeFileAsync = promisify(writeFile);
 
     private handleFetchData = async (operation: Operation) => {
         const res = await net.fetch("http://localhost:3000/api/testDocuments", {
@@ -42,16 +55,21 @@ export class DirectoryLO{
         return res.ok;
     }
 
+    handleGetSyncStatus = () => {
+        return this.isSync;
+    }
+
     //Метод для создания файла очереди операций
-    createListOpearionFile(){
-        console.log("Method work!");
+    async createListOpearionFile(){
+        console.log("Method work and create list for queue!");
         if(!existsSync(this.folderPath)){
             mkdirSync(this.folderPath, {recursive: true});
-            writeFile(this.filePath, JSON.stringify(this.operationQueue), ((err) => {
-            if(err){
-                throw new Error("Error of create list operation!");
-            }
-            }));
+                const operationQueue: IOperationQueue = {
+                    [TypeOperations.POST]: [],
+                    [TypeOperations.PUT]: [],
+                    [TypeOperations.DELETE]: []
+                };
+            await this.writeFileAsync(this.filePath, JSON.stringify(operationQueue));
         }
     }
 
@@ -62,11 +80,11 @@ export class DirectoryLO{
 
         const body = JSON.stringify(this.operationQueue);
 
-        await writeFile(this.filePath, body, (err) => {
-            if(err){
-                throw new Error("Error write note!");
-            }
-        });
+        try {
+            await this.writeFileAsync(this.filePath, body);
+        } catch {
+            throw new Error("Error write note!");
+        }
     }
 
     //Метод для чтения очереди операций
@@ -82,39 +100,40 @@ export class DirectoryLO{
 
     //Метод для отправки операций
     private async sendOperaionLoop(){
-        await this.readOpeartionFile();
-        for(const typeOp of [TypeOperations.POST, TypeOperations.PUT, TypeOperations.DELETE]){
-            console.log("send typeOp: ", typeOp);
-            console.log("lenght: ", this.operationQueue[typeOp]);
-            while(this.operationQueue[typeOp].length){
-                const op = this.operationQueue[typeOp].shift();
-                if(op){
-                    const res = await this.handleFetchData(op);
-                    if(!res){
-                        console.log("res: ", res);
-                        this.operationQueue[typeOp].unshift(op);
+        if(this.isStatusSend){
+            await this.readOpeartionFile();
+            for(const typeOp of [TypeOperations.POST, TypeOperations.PUT, TypeOperations.DELETE]){
+                console.log("send typeOp: ", typeOp);
+                console.log("lenght: ", this.operationQueue[typeOp]);
+                while(this.operationQueue[typeOp].length){
+                    console.log("lenght-before: ", this.operationQueue[typeOp]);
+                    const op = this.operationQueue[typeOp].shift();
+                    console.log("op-:", op);
+                    if(op){
+                        const res = await this.handleFetchData(op);
+                        if(!res){
+                            console.log("res-unshift: ", res);
+                            this.operationQueue[typeOp].unshift(op);
+                        }
+                        const body = JSON.stringify(this.operationQueue);
+                        this.writeFileAsync(this.filePath, body, "utf-8");
+                        this.isSync = true;
                     }
                 }
             }
         }
-
-        const body = JSON.stringify(this.operationQueue);
-
-        writeFile(this.filePath, body, (err) => {
-            if(err){
-                throw new Error("Error save queue in file");
-            }
-        })
-
-        this.timer = setTimeout(() => this.sendOperaionLoop(), 5000);
+        
+        this.timer = setTimeout(async () => await this.sendOperaionLoop(), 5000);
     }
 
-    startSendOperation() {
+    async startSendOperation() {
+        this.isStatusSend = true;
         console.log("start send operation");
-        this.sendOperaionLoop();
+        await this.sendOperaionLoop();
     }
 
     stopSendOperation() {
+        this.isStatusSend = false;
         console.log("end send operation");
         if(this.timer){
             clearTimeout(this.timer);

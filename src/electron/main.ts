@@ -47,10 +47,6 @@ app.whenReady().then(async () => {
   //Чтение заметок
   directoryNotes.readNotesDirectory();
   
-  //Чтение очереди операций для синхронизации между устройствами
-  directoryLO.createListOpearionFile();
-  // directoryLO.readOperation();
-  
   //Запуск основого окна
   createMainWindow();
 });
@@ -209,9 +205,9 @@ ipcMain.handle("save-user-data", async (event, user: UserData) => {
   return directoryUserData.saveUserFile(user)
 })
 
-// ipcMain.handle("get-current-status-sync", () => {
-//   return directoryLO.GetCurrentStatus();
-// });
+ipcMain.handle("get-current-status-sync", () => {
+  return directoryLO.handleGetSyncStatus();
+});
 
 ipcMain.handle("start-sync", () => {
   return directoryLO.startSendOperation();
