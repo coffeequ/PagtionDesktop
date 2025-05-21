@@ -60,6 +60,7 @@ export class DirectoryNotes{
     }
       
     async createNotesDirectory(note: Note): Promise<Note> {
+      this.listOP.handleSetSyncStatusFalse();
       return new Promise((resolve, reject) => {
         const filePath = `${this.folderPath}/${note.id}.json`;
         writeFile(filePath, JSON.stringify(note), (err) => {
@@ -79,6 +80,7 @@ export class DirectoryNotes{
     
       
     async deleteNoteDirectory(noteId: string): Promise<Note>{
+      this.listOP.handleSetSyncStatusFalse();
        return new Promise((resolve, rejects) => {
         unlink(`${this.folderPath}/${noteId}.json`, (err) => {
           if(err){
@@ -165,6 +167,7 @@ export class DirectoryNotes{
 
     async updateNotes({ id, title, content, isPublished, icon, coverImage}: IUpdateProps){
       if(this.updateMap.has(id)){
+        this.listOP.handleSetSyncStatusFalse();
         const item: IUpdateProps = this.updateMap.get(id);
         if(title !== undefined) item.title = title;
         if(content !== undefined) item.content = content;

@@ -59,22 +59,33 @@ export class DirectoryLO{
         return this.isSync;
     }
 
+    handleSetSyncStatusTrue = () => {
+        this.isSync = true;
+    }
+
+    handleSetSyncStatusFalse = () => {
+        this.isSync = false;
+    }
+
     //Метод для создания файла очереди операций
     async createListOpearionFile(){
         console.log("Method work and create list for queue!");
         if(!existsSync(this.folderPath)){
             mkdirSync(this.folderPath, {recursive: true});
-                const operationQueue: IOperationQueue = {
-                    [TypeOperations.POST]: [],
-                    [TypeOperations.PUT]: [],
-                    [TypeOperations.DELETE]: []
-                };
-            await this.writeFileAsync(this.filePath, JSON.stringify(operationQueue));
+            await this.writeFileAsync(this.filePath, JSON.stringify(this.operationQueue));
         }
     }
 
     //Метод для записи операции в файл и очередь
     async writeOperationFile(operation: Operation){
+
+        // Always reload the latest queue from file before pushing
+        try {
+            await this.readOpeartionFile();
+        } catch (e) {
+            // If file doesn't exist or can't be read, continue with current queue
+            console.warn("Could not read operation file before writing, using current queue.", e);
+        }
 
         this.operationQueue[operation.typeOperation].push(operation);
 
@@ -99,14 +110,14 @@ export class DirectoryLO{
     }
 
     //Метод для отправки операций
-    private async sendOperaionLoop(){
+    private async sendOperationLoop(){
         if(this.isStatusSend){
             await this.readOpeartionFile();
             for(const typeOp of [TypeOperations.POST, TypeOperations.PUT, TypeOperations.DELETE]){
                 console.log("send typeOp: ", typeOp);
-                console.log("lenght: ", this.operationQueue[typeOp]);
+                console.log("length: ", this.operationQueue[typeOp]);
                 while(this.operationQueue[typeOp].length){
-                    console.log("lenght-before: ", this.operationQueue[typeOp]);
+                    console.log("length-before: ", this.operationQueue[typeOp]);
                     const op = this.operationQueue[typeOp].shift();
                     console.log("op-:", op);
                     if(op){
@@ -116,20 +127,19 @@ export class DirectoryLO{
                             this.operationQueue[typeOp].unshift(op);
                         }
                         const body = JSON.stringify(this.operationQueue);
-                        this.writeFileAsync(this.filePath, body, "utf-8");
-                        this.isSync = true;
+                        await this.writeFileAsync(this.filePath, body, { encoding: "utf-8" });
                     }
                 }
             }
         }
         
-        this.timer = setTimeout(async () => await this.sendOperaionLoop(), 5000);
+        this.timer = setTimeout(async () => await this.sendOperationLoop(), 5000);
     }
 
     async startSendOperation() {
         this.isStatusSend = true;
         console.log("start send operation");
-        await this.sendOperaionLoop();
+        await this.sendOperationLoop();
     }
 
     stopSendOperation() {

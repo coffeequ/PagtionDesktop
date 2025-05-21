@@ -56,6 +56,7 @@ export default function DocumentIdPage(){
     const onChangeContent = useCallback(async (content: string) => {
         //@ts-ignore
         await window.electronAPI.updateNote({id: id as string, content});
+        
         triggerRefresh();
     }, [id as string])
 
