@@ -57,8 +57,6 @@ export default function LoginForm(){
                     response.json().then((item) => {
                     window.localStorage.setItem("user", JSON.stringify(item));
                     SetStatusSync(false);
-                    //@ts-ignore
-                    window.electronAPI.SaveUserData(item);
                     setSuccess("Авторизация прошла успешно!");
                     navigate("/document/startPage");});
                     return;

@@ -6,7 +6,6 @@ import { IUpdateProps } from './interfaces/IUpdateNote.js';
 import { IFilesUpload } from './interfaces/IFilesUpload.js';
 import { DirectoryFile } from './classes/DirectoryFiles.js';
 import { IUser } from './interfaces/IUser.js';
-import { UserData } from "./classes/DirectoryUserData.js"
 import { DirectoryLO } from './classes/ListOperation.js';
 
 
@@ -17,7 +16,6 @@ let mainWindow: BrowserWindow;
 
 let directoryNotes = new DirectoryNotes();
 let directoryFile = new DirectoryFile();
-let directoryUserData = new UserData();
 let directoryLO = new DirectoryLO();
 
 //Главное окно приложения
@@ -108,9 +106,6 @@ if (!gotTheLock) {
         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
         
         mainWindow.isFocused();
-        
-        directoryUserData.saveUserFile(user);
-
       }
     }
   });
@@ -127,7 +122,6 @@ app.on("open-url", (event, url) => {
     image: parsedUrl.searchParams.get("image")!
   }
   if(mainWindow){
-    directoryUserData.saveUserFile(user);
     mainWindow.webContents.send("deep-link", user);
     mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
     mainWindow.isFocused();    
@@ -200,10 +194,6 @@ ipcMain.handle("path-notes", () => {
 ipcMain.handle("path-files", () => {
   return directoryFile.GetFolderFilesPath();
 });
-
-ipcMain.handle("save-user-data", async (event, user: UserData) => {
-  return directoryUserData.saveUserFile(user)
-})
 
 ipcMain.handle("get-current-status-sync", () => {
   return directoryLO.handleGetSyncStatus();

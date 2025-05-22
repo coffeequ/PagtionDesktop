@@ -33,6 +33,8 @@ export class DirectoryLO{
 
     private isSync: boolean = true;
 
+    //todo: Сделать проверку на подключение к серверу через ping get запрос
+
     //0 - POST, 1 - PUT, 2 - DELETE
     private operationQueue: IOperationQueue = {
         [TypeOperations.POST]: [],
@@ -45,7 +47,7 @@ export class DirectoryLO{
     private writeFileAsync = promisify(writeFile);
 
     private handleFetchData = async (operation: Operation) => {
-        const res = await net.fetch("http://localhost:3000/api/testDocuments", {
+        const res = await net.fetch("http://localhost:3000/api/remoteSync", {
             method: operation.typeOperation,
             headers: {
                 "Content-Type": "Application/json"
