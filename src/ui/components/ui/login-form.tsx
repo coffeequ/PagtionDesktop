@@ -1,6 +1,7 @@
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
+
 import {
     Form,
     FormControl,
@@ -56,6 +57,8 @@ export default function LoginForm(){
                 if(response.ok) {
                     response.json().then((item) => {
                     window.localStorage.setItem("user", JSON.stringify(item));
+                    //@ts-ignore
+                    window.electronAPI.SaveUserData(item);
                     SetStatusSync(false);
                     setSuccess("Авторизация прошла успешно!");
                     navigate("/document/startPage");});

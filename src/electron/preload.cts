@@ -71,7 +71,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
    },
    GetIsStatusSync: () => {
       return ipcRenderer.invoke("get-current-status-sync");
-   }
+   },
+   SaveUserData: (user: any) => {
+      return ipcRenderer.invoke("save-user-data", user);
+   },
 });
 
 

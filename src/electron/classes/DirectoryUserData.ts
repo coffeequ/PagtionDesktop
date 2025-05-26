@@ -1,0 +1,47 @@
+import { app } from "electron";
+import { IUser } from "../interfaces/IUser.js";
+import path from "path";
+import { existsSync, mkdirSync, readFile, writeFile } from "fs";
+import { promisify } from "util";
+
+
+export class UserData implements IUser{
+    id: string = "";
+    email: string = "";
+    name: string = "";
+    image: string | null = "";
+    
+    private userPath: string = app.getPath("userData");
+    
+    private folderPath: string = path.join(this.userPath, "UserInfo");
+
+    private fileName: string = "userData";
+
+    private readFileAsync = promisify(readFile);
+
+    private writeFileAsync = promisify(writeFile);
+
+    private filePath = `${this.folderPath}/${this.fileName}.json`;
+
+    async saveUserFile(user: IUser){
+        if(!existsSync(this.folderPath)){
+            mkdirSync(this.folderPath, { recursive: true })
+        }
+        const body = JSON.stringify({
+            id: user.id
+        });
+
+        try {
+            this.writeFileAsync(this.filePath, body);
+            return true
+        } catch {
+            return false;
+        }
+    }
+
+    async readUserFile(): Promise<UserData> { 
+        const raw = await this.readFileAsync(this.filePath, "utf-8");
+        const userData: UserData = JSON.parse(raw);
+        return userData;
+    }
+}

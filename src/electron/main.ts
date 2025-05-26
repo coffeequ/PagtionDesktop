@@ -7,7 +7,7 @@ import { IFilesUpload } from './interfaces/IFilesUpload.js';
 import { DirectoryFile } from './classes/DirectoryFiles.js';
 import { IUser } from './interfaces/IUser.js';
 import { DirectoryLO } from './classes/ListOperation.js';
-
+import { UserData } from "./classes/DirectoryUserData.js"
 
 type Theme = "dark" | "light";
 
@@ -17,6 +17,7 @@ let mainWindow: BrowserWindow;
 let directoryNotes = new DirectoryNotes();
 let directoryFile = new DirectoryFile();
 let directoryLO = new DirectoryLO();
+let directoryUserData = new UserData();
 
 //Главное окно приложения
 function createMainWindow(){
@@ -96,16 +97,19 @@ if (!gotTheLock) {
         id: parsedUrl.searchParams.get("id")!,
         email: parsedUrl.searchParams.get("email")!,
         name: parsedUrl.searchParams.get("name")!,
-        image: parsedUrl.searchParams.get("image")!
+        image: parsedUrl.searchParams.get("image")!,
+        documents: JSON.parse(parsedUrl.searchParams.get("documents")!),
       }
       
       if (mainWindow) {
-        
+
         mainWindow.webContents.send("deep-link", user);
         
         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
         
         mainWindow.isFocused();
+
+        directoryUserData.saveUserFile(user);
       }
     }
   });
@@ -119,12 +123,14 @@ app.on("open-url", (event, url) => {
     id: parsedUrl.searchParams.get("id")!,
     email: parsedUrl.searchParams.get("email")!,
     name: parsedUrl.searchParams.get("name")!,
-    image: parsedUrl.searchParams.get("image")!
+    image: parsedUrl.searchParams.get("image")!,
+    documents: JSON.parse(parsedUrl.searchParams.get("documents")!),
   }
   if(mainWindow){
     mainWindow.webContents.send("deep-link", user);
     mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
-    mainWindow.isFocused();    
+    mainWindow.isFocused();
+    directoryUserData.saveUserFile(user);
   }  
 });
 
@@ -206,3 +212,7 @@ ipcMain.handle("start-sync", () => {
 ipcMain.handle("stop-sync", () => {
   return directoryLO.stopSendOperation();
 });
+
+ipcMain.handle("save-user-data", async (event, user: UserData) => {
+  return directoryUserData.saveUserFile(user)
+})

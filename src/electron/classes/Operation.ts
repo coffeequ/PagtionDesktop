@@ -5,16 +5,13 @@ export class Operation{
 
     typeOperation: TypeOperations;
 
-    data: string | undefined;
-
-    dateAt: Date;
+    dateAt: Date = new Date();
 
     note: Note;
 
-    constructor(note: Note, dateAt: Date, typeOperation: TypeOperations) {
+    constructor(note: Note, typeOperation: TypeOperations) {
         this.typeOperation = typeOperation;
         this.note = note;
-        this.dateAt = dateAt;
     }
 
 }
