@@ -38,6 +38,10 @@ export class DirectoryNotes{
         });
     }
 
+    public GetHashNote(){
+      return new Map(this.hashNotes);
+    }
+
     GetFolderNotePath(): string {
       return this.folderPath;
     }

@@ -1,8 +1,10 @@
-import { app } from "electron";
+import { app, net } from "electron";
 import { IUser } from "../interfaces/IUser.js";
 import path from "path";
 import { existsSync, mkdirSync, readFile, writeFile } from "fs";
 import { promisify } from "util";
+import { DirectorySyncNote } from "./DirectorySyncNote.js";
+import { Note } from "./Note.js";
 
 
 export class UserData implements IUser{
@@ -23,6 +25,8 @@ export class UserData implements IUser{
 
     private filePath = `${this.folderPath}/${this.fileName}.json`;
 
+    private directorySyncNote: DirectorySyncNote = new DirectorySyncNote();
+
     async saveUserFile(user: IUser){
         if(!existsSync(this.folderPath)){
             mkdirSync(this.folderPath, { recursive: true })
@@ -31,11 +35,14 @@ export class UserData implements IUser{
             id: user.id
         });
 
+        const data: Note[] = await this.directorySyncNote.fetchPostNote(body);
+
+        this.directorySyncNote.ExistsNoteLocale(data);
+
         try {
             this.writeFileAsync(this.filePath, body);
-            return true
         } catch {
-            return false;
+            throw new Error("Error save user data");
         }
     }
 

@@ -1,13 +1,18 @@
 import { app, BrowserWindow, shell, ipcMain, nativeTheme, net } from 'electron';
 import path from 'path';
-import { DirectoryNotes } from './classes/DirectoryNotes.js';
-import { Note } from './classes/Note.js';
+
+//Интерфейсы
 import { IUpdateProps } from './interfaces/IUpdateNote.js';
 import { IFilesUpload } from './interfaces/IFilesUpload.js';
-import { DirectoryFile } from './classes/DirectoryFiles.js';
 import { IUser } from './interfaces/IUser.js';
+
+//Классы
 import { DirectoryLO } from './classes/ListOperation.js';
+import { DirectoryFile } from './classes/DirectoryFiles.js';
 import { UserData } from "./classes/DirectoryUserData.js"
+import { DirectorySyncNote } from './classes/DirectorySyncNote.js';
+import { DirectoryNotes } from './classes/DirectoryNotes.js';
+import { Note } from './classes/Note.js';
 
 type Theme = "dark" | "light";
 
@@ -18,6 +23,7 @@ let directoryNotes = new DirectoryNotes();
 let directoryFile = new DirectoryFile();
 let directoryLO = new DirectoryLO();
 let directoryUserData = new UserData();
+let directorySyncData = new DirectorySyncNote();
 
 //Главное окно приложения
 function createMainWindow(){
@@ -38,13 +44,20 @@ function createMainWindow(){
 
 //Создание окна при загрузки приложения
 app.whenReady().then(async () => {
-  
+
+  // TODO: Первый вариант  
+  // GET - Запрос
+  // directorySyncData.ExistsNoteLocale();
+
   //Чтение файлов
   directoryFile.createFolder();
   directoryFile.readNameFiles();
   
   //Чтение заметок
-  directoryNotes.readNotesDirectory();
+  directoryNotes.readNotesDirectory().then(() => {
+      //Получение ссылки хеш-мапы от 
+      directorySyncData.SyncHashMap(directoryNotes);
+  });
   
   //Запуск основого окна
   createMainWindow();
@@ -100,6 +113,8 @@ if (!gotTheLock) {
         image: parsedUrl.searchParams.get("image")!,
         documents: JSON.parse(parsedUrl.searchParams.get("documents")!),
       }
+
+      directorySyncData.ExistsNoteLocale(user.documents!);
       
       if (mainWindow) {
 
@@ -126,6 +141,7 @@ app.on("open-url", (event, url) => {
     image: parsedUrl.searchParams.get("image")!,
     documents: JSON.parse(parsedUrl.searchParams.get("documents")!),
   }
+  directorySyncData.ExistsNoteLocale(user.documents!);  
   if(mainWindow){
     mainWindow.webContents.send("deep-link", user);
     mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
