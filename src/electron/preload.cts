@@ -75,6 +75,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
    SaveUserData: (user: any) => {
       return ipcRenderer.invoke("save-user-data", user);
    },
+   LoadUserNote: () => {
+      return ipcRenderer.invoke("load-notes");
+   }
 });
 
 

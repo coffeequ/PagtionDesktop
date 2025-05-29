@@ -53,9 +53,27 @@ app.whenReady().then(async () => {
   directoryFile.createFolder();
   directoryFile.readNameFiles();
   
+  //Получение айди пользователя для фетчинга данных с сервера
+  const userData = await directoryUserData.readUserFile();
+  
+  if(userData){
+
+    const res = await directorySyncData.fetchPostNote(userData.id);
+
+    console.log(res);
+
+    if(res.ok){
+      const notes: Note[] = await res.json();
+
+      console.log("get notes: ", notes);
+
+      await directorySyncData.ExistsNoteLocale(notes);
+    }
+  }
+
   //Чтение заметок
-  directoryNotes.readNotesDirectory().then(() => {
-      //Получение ссылки хеш-мапы от 
+  directoryNotes.readNotesDirectory().then(() => { 
+      console.log("Get hash map");
       directorySyncData.SyncHashMap(directoryNotes);
   });
   

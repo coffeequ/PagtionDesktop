@@ -35,10 +35,6 @@ export class UserData implements IUser{
             id: user.id
         });
 
-        const data: Note[] = await this.directorySyncNote.fetchPostNote(body);
-
-        this.directorySyncNote.ExistsNoteLocale(data);
-
         try {
             this.writeFileAsync(this.filePath, body);
         } catch {
@@ -46,7 +42,7 @@ export class UserData implements IUser{
         }
     }
 
-    async readUserFile(): Promise<UserData> { 
+    async readUserFile(): Promise<UserData | undefined> { 
         const raw = await this.readFileAsync(this.filePath, "utf-8");
         const userData: UserData = JSON.parse(raw);
         return userData;

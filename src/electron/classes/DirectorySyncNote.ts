@@ -37,15 +37,15 @@ export class DirectorySyncNote{
     await Promise.all(promiseWrite);
   }
 
-  public async fetchPostNote(body: string){
+  public async fetchPostNote(id: string): Promise<Response>{
     const res = await net.fetch("http://localhost:3000/api/getNote", {
       method: "POST",
       headers: {
-        "Content-type": "application/json"
+        "Content-Type": "application/json"
       },
-        body: body
+        body: JSON.stringify({id})
       })
-      return await res.json();
+      return res;
   }
   
 }
