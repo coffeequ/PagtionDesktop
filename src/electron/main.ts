@@ -72,10 +72,7 @@ app.whenReady().then(async () => {
   }
 
   //Чтение заметок
-  directoryNotes.readNotesDirectory().then(() => { 
-      console.log("Get hash map");
-      directorySyncData.SyncHashMap(directoryNotes);
-  });
+  directoryNotes.readNotesDirectory();
   
   //Запуск основого окна
   createMainWindow();
