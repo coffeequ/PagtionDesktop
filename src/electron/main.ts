@@ -16,6 +16,11 @@ import { Note } from './classes/Note.js';
 
 type Theme = "dark" | "light";
 
+//TODO: 
+// 1) Не забыдь сделать для каждого пользователя свой listoperation;
+// 2) Сделать проверку подключения к серверу используя его api. Уточнее: сделать эндпоинт для получения состояния.
+
+
 //Remind: В продакшене использовать две .., в дев .
 let mainWindow: BrowserWindow;
 
@@ -45,10 +50,6 @@ function createMainWindow(){
 //Создание окна при загрузки приложения
 app.whenReady().then(async () => {
 
-  // TODO: Первый вариант  
-  // GET - Запрос
-  // directorySyncData.ExistsNoteLocale();
-
   //Чтение файлов
   directoryFile.createFolder();
   directoryFile.readNameFiles();
@@ -56,19 +57,15 @@ app.whenReady().then(async () => {
   //Получение айди пользователя для фетчинга данных с сервера
   const userData = await directoryUserData.readUserFile();
   
-  if(userData){
+  const res = await directorySyncData.fetchPostNote(userData.id);
 
-    const res = await directorySyncData.fetchPostNote(userData.id);
-
-    console.log(res);
-
-    if(res.ok){
-      const notes: Note[] = await res.json();
-
-      console.log("get notes: ", notes);
-
-      await directorySyncData.ExistsNoteLocale(notes);
-    }
+  if(res.ok){
+  
+    const notes: Note[] = await res.json();
+  
+    console.log("get notes: ", notes);
+  
+    await directorySyncData.ExistsNoteLocale(notes);
   }
 
   //Чтение заметок

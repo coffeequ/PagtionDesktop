@@ -25,8 +25,6 @@ export class UserData implements IUser{
 
     private filePath = `${this.folderPath}/${this.fileName}.json`;
 
-    private directorySyncNote: DirectorySyncNote = new DirectorySyncNote();
-
     async saveUserFile(user: IUser){
         if(!existsSync(this.folderPath)){
             mkdirSync(this.folderPath, { recursive: true })
@@ -42,7 +40,7 @@ export class UserData implements IUser{
         }
     }
 
-    async readUserFile(): Promise<UserData | undefined> { 
+    async readUserFile(): Promise<UserData> { 
         const raw = await this.readFileAsync(this.filePath, "utf-8");
         const userData: UserData = JSON.parse(raw);
         return userData;

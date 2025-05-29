@@ -10,6 +10,8 @@ export class DirectorySyncNote{
 
   private folderPath: string = path.join(this.userPath, "Notes");
 
+  private statusWeb: boolean = false;
+
   GetFolderNotePath(): string {
     return this.folderPath;
   }
@@ -29,14 +31,19 @@ export class DirectorySyncNote{
   }
 
   public async fetchPostNote(id: string): Promise<Response>{
-    const res = await net.fetch("http://localhost:3000/api/getNote", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-        body: JSON.stringify({id})
-      })
-      return res;
+    try {
+        const res = await net.fetch("http://localhost:3000/api/getNote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+          body: JSON.stringify({id})
+        })
+        
+        return res;
+      } catch {
+        return new Response(JSON.stringify({error: "Error connect"}), {status: 404});
+      }
   }
   
 }
