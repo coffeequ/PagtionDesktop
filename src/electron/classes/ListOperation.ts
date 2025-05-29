@@ -1,10 +1,11 @@
 import { app, net } from "electron";
-import { existsSync, mkdirSync, readFile, writeFile } from "fs";
+import { existsSync, mkdirSync, promises, readFile, writeFile } from "fs";
 import path from "path";
 import { Operation } from "./Operation.js";
 import { promisify } from "util";
 import { IOperationQueue } from "../interfaces/IOperationQueue.js";
 import { TypeOperations } from "../enums/TypeOperation.js";
+import { UserData } from "./DirectoryUserData.js";
 
 export class DirectoryLO{
 
@@ -12,7 +13,10 @@ export class DirectoryLO{
      *Создание файла для записи очередей
      */
     constructor() {
-        this.createListOpearionFile();
+        const quequeLoad = async () => {
+            await this.createListOpearionFile();
+        }
+        quequeLoad();
     }
 
     //TODO: Сделать хеш-мапу для операций. То есть, если допустим была операция добавления и затем удаления
@@ -23,15 +27,15 @@ export class DirectoryLO{
 
     private folderPath: string = path.join(this.userPath, "ListOperaion");
 
-    private fileName: string = "OperationOffline";
-
-    private filePath = `${this.folderPath}/${this.fileName}.json`;
+    private filePath: string = " ";
 
     private timer: NodeJS.Timeout | null = null;
 
     private isStatusSend: boolean = false;
 
     private isSync: boolean = true;
+
+    private directoryUser: UserData = new UserData();
 
     //todo: Сделать проверку на подключение к серверу через ping get запрос
 
@@ -71,6 +75,13 @@ export class DirectoryLO{
 
     //Метод для создания файла очереди операций
     async createListOpearionFile(){
+        
+        const userId = await this.directoryUser.readUserFile();
+
+        const fileName: string = userId.id;
+
+        this.filePath = `${this.folderPath}/${fileName}.json`;
+        
         console.log("Method work and create list for queue!");
         if(!existsSync(this.folderPath)){
             mkdirSync(this.folderPath, {recursive: true});
@@ -81,11 +92,9 @@ export class DirectoryLO{
     //Метод для записи операции в файл и очередь
     async writeOperationFile(operation: Operation){
 
-        // Always reload the latest queue from file before pushing
         try {
             await this.readOpeartionFile();
         } catch (e) {
-            // If file doesn't exist or can't be read, continue with current queue
             console.warn("Could not read operation file before writing, using current queue.", e);
         }
 

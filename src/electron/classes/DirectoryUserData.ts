@@ -3,9 +3,6 @@ import { IUser } from "../interfaces/IUser.js";
 import path from "path";
 import { existsSync, mkdirSync, readFile, writeFile } from "fs";
 import { promisify } from "util";
-import { DirectorySyncNote } from "./DirectorySyncNote.js";
-import { Note } from "./Note.js";
-
 
 export class UserData implements IUser{
     id: string = "";
