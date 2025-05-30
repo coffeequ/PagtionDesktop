@@ -7,12 +7,14 @@ import { IFilesUpload } from './interfaces/IFilesUpload.js';
 import { IUser } from './interfaces/IUser.js';
 
 //Классы
-import { DirectoryLO } from './classes/ListOperation.js';
 import { DirectoryFile } from './classes/DirectoryFiles.js';
 import { UserData } from "./classes/DirectoryUserData.js"
 import { DirectorySyncNote } from './classes/DirectorySyncNote.js';
 import { DirectoryNotes } from './classes/DirectoryNotes.js';
 import { Note } from './classes/Note.js';
+
+//Синглтон класса DirectoryLO
+import { directoryLO } from './classes/ListOperation.js';
 
 type Theme = "dark" | "light";
 
@@ -25,7 +27,7 @@ let mainWindow: BrowserWindow;
 
 let directoryNotes = new DirectoryNotes();
 let directoryFile = new DirectoryFile();
-let directoryLO = new DirectoryLO();
+
 let directoryUserData = new UserData();
 let directorySyncData = new DirectorySyncNote();
 
@@ -62,13 +64,17 @@ app.whenReady().then(async () => {
   
     const notes: Note[] = await res.json();
   
-    console.log("get notes: ", notes);
+    // console.log("get notes: ", notes);
   
     await directorySyncData.ExistsNoteLocale(notes);
   }
 
   //Чтение заметок
   directoryNotes.readNotesDirectory();
+
+  const user = await directoryUserData.readUserFile();
+
+  await directoryLO.createListOpearionFile(user.id);
   
   //Запуск основого окна
   createMainWindow();
@@ -232,7 +238,7 @@ ipcMain.handle("get-current-status-sync", () => {
   return directoryLO.handleGetSyncStatus();
 });
 
-ipcMain.handle("start-sync", () => {
+ipcMain.handle("start-sync", async () => {
   return directoryLO.startSendOperation();
 });
 
@@ -241,5 +247,5 @@ ipcMain.handle("stop-sync", () => {
 });
 
 ipcMain.handle("save-user-data", async (event, user: UserData) => {
-  return directoryUserData.saveUserFile(user)
+  return directoryUserData.saveUserFile(user);
 })

@@ -3,9 +3,10 @@ import { existsSync, mkdirSync, promises, readFile, unlink, writeFile } from "fs
 import path from "path";
 import { Note } from "./Note.js";
 import { IUpdateProps } from "../interfaces/IUpdateNote.js";
-import { DirectoryLO } from "./ListOperation.js";
 import { Operation } from "./Operation.js";
 import { TypeOperations } from "../enums/TypeOperation.js";
+
+import { directoryLO } from '../classes/ListOperation.js';
 
 export class DirectoryNotes{
     
@@ -25,7 +26,7 @@ export class DirectoryNotes{
 
     public hashNotes = new Map();
 
-    private listOP: DirectoryLO = new DirectoryLO();
+    private listOP = directoryLO;
 
     private readFilePromise(filePath: string): Promise<string> {
         return new Promise((resolve, reject) => {
@@ -68,6 +69,7 @@ export class DirectoryNotes{
     }
       
     async createNotesDirectory(note: Note): Promise<Note> {
+      this.listOP.handlSetFilePath(note.userId);
       return new Promise((resolve, reject) => {
         const filePath = `${this.folderPath}/${note.id}.json`;
         writeFile(filePath, JSON.stringify(note), (err) => {
