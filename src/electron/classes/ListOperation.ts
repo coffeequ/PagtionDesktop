@@ -41,7 +41,7 @@ export class DirectoryLO{
 
     private handleFetchData = async (operation: Operation) => {
        try {
-         const res = await net.fetch("http://localhost:3000/api/remoteSync", {
+         const res = await net.fetch("https://pagtion.vercel.app/api/remoteSync", {
                 method: operation.typeOperation,
                 headers: {
                     "Content-Type": "Application/json"

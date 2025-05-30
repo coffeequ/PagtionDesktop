@@ -45,7 +45,7 @@ export default function LoginForm(){
             const password = values.password;
     
             try {
-                const response = await fetch('http://localhost:3000/api/authenticate', {
+                const response = await fetch('https://pagtion.vercel.app/api/authenticate', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

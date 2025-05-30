@@ -32,7 +32,7 @@ export class DirectorySyncNote{
 
   public async fetchPostNote(id: string): Promise<Response>{
     try {
-        const res = await net.fetch("http://localhost:3000/api/getNote", {
+        const res = await net.fetch("https://pagtion.vercel.app/api/getNote", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
