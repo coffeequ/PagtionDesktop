@@ -1,6 +1,7 @@
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
+
 import {
     Form,
     FormControl,
@@ -17,6 +18,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { FormError } from "./form-error"
 import { FormSucces } from "./form-success"
 import { useState, useTransition } from "react"
+import { SetStatusSync } from "@/actions/statusSync"
 
 export default function LoginForm(){
 
@@ -46,7 +48,7 @@ export default function LoginForm(){
                 const response = await fetch('https://pagtion.vercel.app/api/authenticate', {
                         method: 'POST',
                         headers: {
-                                'Content-Type': 'application/json',
+                            'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
                             email, password
@@ -55,14 +57,21 @@ export default function LoginForm(){
                 if(response.ok) {
                     response.json().then((item) => {
                     window.localStorage.setItem("user", JSON.stringify(item));
+                    //@ts-ignore
+                    window.electronAPI.SaveUserData(item);
+                    SetStatusSync(false);
                     setSuccess("Авторизация прошла успешно!");
                     navigate("/document/startPage");});
-                return;
-              } else {
-                setError("Произошла ошибка авторизации");
-                return;
+                    return;
+                } else {
+                    const fetchData = async () =>{
+                        const data = await response.json();
+                        setError(data.error);
+                    }
+                    fetchData();
+                    return;
               }
-            } catch (error: any) {
+            } catch {
                 setError("Упс... Произошла ошибка авторизации");
             }  
         })

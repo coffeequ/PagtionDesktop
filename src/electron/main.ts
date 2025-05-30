@@ -1,20 +1,35 @@
-import { app, BrowserWindow, shell, ipcMain, nativeTheme } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, nativeTheme, net } from 'electron';
 import path from 'path';
-import { DirectoryNotes } from './classes/DirectoryNotes.js';
-import { Note } from './classes/Note.js';
+
+//Интерфейсы
 import { IUpdateProps } from './interfaces/IUpdateNote.js';
 import { IFilesUpload } from './interfaces/IFilesUpload.js';
-import { DirectoryFile } from './classes/DirectoryFiles.js';
 import { IUser } from './interfaces/IUser.js';
 
+//Классы
+import { DirectoryFile } from './classes/DirectoryFiles.js';
+import { UserData } from "./classes/DirectoryUserData.js"
+import { DirectorySyncNote } from './classes/DirectorySyncNote.js';
+import { DirectoryNotes } from './classes/DirectoryNotes.js';
+import { Note } from './classes/Note.js';
+
+//Синглтон класса DirectoryLO
+import { directoryLO } from './classes/ListOperation.js';
 
 type Theme = "dark" | "light";
+
+//TODO: 
+// 1) Сделать проверку подключения к серверу используя его api. Уточнее: сделать эндпоинт для получения состояния.
+
 
 //Remind: В продакшене использовать две .., в дев .
 let mainWindow: BrowserWindow;
 
 let directoryNotes = new DirectoryNotes();
 let directoryFile = new DirectoryFile();
+
+let directoryUserData = new UserData();
+let directorySyncData = new DirectorySyncNote();
 
 //Главное окно приложения
 function createMainWindow(){
@@ -33,11 +48,35 @@ function createMainWindow(){
   mainWindow.menuBarVisible = false;
 }
 
-//Создание окна при полной загрузки приложения
+//Создание окна при загрузки приложения
 app.whenReady().then(async () => {
+
+  //Чтение файлов
   directoryFile.createFolder();
   directoryFile.readNameFiles();
+  
+  //Получение айди пользователя для фетчинга данных с сервера
+  const userData = await directoryUserData.readUserFile();
+  
+  const res = await directorySyncData.fetchPostNote(userData.id);
+
+  if(res.ok){
+  
+    const notes: Note[] = await res.json();
+  
+    // console.log("get notes: ", notes);
+  
+    await directorySyncData.ExistsNoteLocale(notes);
+  }
+
+  //Чтение заметок
   directoryNotes.readNotesDirectory();
+
+  const user = await directoryUserData.readUserFile();
+
+  await directoryLO.createListOpearionFile(user.id);
+  
+  //Запуск основого окна
   createMainWindow();
 });
 
@@ -70,7 +109,7 @@ ipcMain.handle("ToggleTheme", (event, theme: Theme) => {
   toggleTheme(theme);
 });
 
-//Не допускать открытие нового окна. Передача данные из окна браузера
+//Не допускать открытие нового окна. Передача данных из окна браузера
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
@@ -88,10 +127,11 @@ if (!gotTheLock) {
         id: parsedUrl.searchParams.get("id")!,
         email: parsedUrl.searchParams.get("email")!,
         name: parsedUrl.searchParams.get("name")!,
-        image: parsedUrl.searchParams.get("image")!
+        image: parsedUrl.searchParams.get("image")!,
+        documents: JSON.parse(parsedUrl.searchParams.get("documents")!),
       }
 
-      //console.log("полученный user: ");
+      directorySyncData.ExistsNoteLocale(user.documents!);
       
       if (mainWindow) {
 
@@ -100,6 +140,8 @@ if (!gotTheLock) {
         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
         
         mainWindow.isFocused();
+
+        directoryUserData.saveUserFile(user);
       }
     }
   });
@@ -113,12 +155,15 @@ app.on("open-url", (event, url) => {
     id: parsedUrl.searchParams.get("id")!,
     email: parsedUrl.searchParams.get("email")!,
     name: parsedUrl.searchParams.get("name")!,
-    image: parsedUrl.searchParams.get("image")!
+    image: parsedUrl.searchParams.get("image")!,
+    documents: JSON.parse(parsedUrl.searchParams.get("documents")!),
   }
+  directorySyncData.ExistsNoteLocale(user.documents!);  
   if(mainWindow){
     mainWindow.webContents.send("deep-link", user);
     mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
-    mainWindow.isFocused();    
+    mainWindow.isFocused();
+    directoryUserData.saveUserFile(user);
   }  
 });
 
@@ -188,3 +233,19 @@ ipcMain.handle("path-notes", () => {
 ipcMain.handle("path-files", () => {
   return directoryFile.GetFolderFilesPath();
 });
+
+ipcMain.handle("get-current-status-sync", () => {
+  return directoryLO.handleGetSyncStatus();
+});
+
+ipcMain.handle("start-sync", async () => {
+  return directoryLO.startSendOperation();
+});
+
+ipcMain.handle("stop-sync", () => {
+  return directoryLO.stopSendOperation();
+});
+
+ipcMain.handle("save-user-data", async (event, user: UserData) => {
+  return directoryUserData.saveUserFile(user);
+})

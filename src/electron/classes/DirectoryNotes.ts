@@ -3,6 +3,10 @@ import { existsSync, mkdirSync, promises, readFile, unlink, writeFile } from "fs
 import path from "path";
 import { Note } from "./Note.js";
 import { IUpdateProps } from "../interfaces/IUpdateNote.js";
+import { Operation } from "./Operation.js";
+import { TypeOperations } from "../enums/TypeOperation.js";
+
+import { directoryLO } from '../classes/ListOperation.js';
 
 export class DirectoryNotes{
     
@@ -20,7 +24,9 @@ export class DirectoryNotes{
       this._notes = v;
     }
 
-    updateMap = new Map();
+    public hashNotes = new Map();
+
+    private listOP = directoryLO;
 
     private readFilePromise(filePath: string): Promise<string> {
         return new Promise((resolve, reject) => {
@@ -33,7 +39,15 @@ export class DirectoryNotes{
         });
     }
 
+    public GetHashNote(){
+      return new Map(this.hashNotes);
+    }
+
     GetFolderNotePath(): string {
+      return this.folderPath;
+    }
+
+    GetFilesNotePath(): string {
       return this.folderPath;
     }
 
@@ -50,13 +64,14 @@ export class DirectoryNotes{
       const notes: Note[] = await Promise.all(promiseFiles);
       this.notes = notes;
       this.notes.forEach((item) => {
-        this.updateMap.set(item.noteId, item);
+        this.hashNotes.set(item.id, item);
       });
     }
       
     async createNotesDirectory(note: Note): Promise<Note> {
+      this.listOP.handlSetFilePath(note.userId);
       return new Promise((resolve, reject) => {
-        const filePath = `${this.folderPath}/${note.noteId}.json`;
+        const filePath = `${this.folderPath}/${note.id}.json`;
         writeFile(filePath, JSON.stringify(note), (err) => {
           if (err) {
             console.error(err);
@@ -64,7 +79,8 @@ export class DirectoryNotes{
           } else {
             //console.log("createNote: ", note);
             this.notes.push(note);
-            this.updateMap.set(note.noteId, note);
+            this.listOP.writeOperationFile(new Operation(note, TypeOperations.POST));
+            this.hashNotes.set(note.id, note);
             resolve(note);
           }
         });
@@ -79,14 +95,15 @@ export class DirectoryNotes{
             rejects(err);
           }
           else {
-            const indexDelete = this.notes.findIndex((item) => item.noteId === noteId);
+            const indexDelete = this.notes.findIndex((item) => item.id === noteId);
             // console.log("indexDelete: ", indexDelete);
             if(indexDelete === -1){
               throw new Error(`Ошибка удаления. Заметка не была найдена`);
             }
             const [deleteNote] = this.notes.splice(indexDelete, 1); 
             // console.log("Delete note: ", [deleteNote]);
-            this.updateMap.delete(deleteNote.noteId);
+            this.listOP.writeOperationFile(new Operation(deleteNote, TypeOperations.DELETE));
+            this.hashNotes.delete(deleteNote.id);
             resolve(deleteNote);
           }
         });
@@ -95,7 +112,7 @@ export class DirectoryNotes{
       
     async editNoteDirectory(note : IUpdateProps): Promise<IUpdateProps> {
       return new Promise((resolve, rejects) => {
-        writeFile(`${this.folderPath}/${note.noteId}.json`, JSON.stringify(note), (err) => {
+        writeFile(`${this.folderPath}/${note.id}.json`, JSON.stringify(note), (err) => {
           if(err){
             rejects(err);
           }
@@ -107,9 +124,9 @@ export class DirectoryNotes{
   }
 
   async restoreNote(noteId: string){
-    if(this.updateMap.has(noteId)){
-      const note: Note = this.updateMap.get(noteId);
-      const parentNote: Note = this.updateMap.get(note.parentDocumentId); 
+    if(this.hashNotes.has(noteId)){
+      const note: Note = this.hashNotes.get(noteId);
+      const parentNote: Note = this.hashNotes.get(note.parentDocumentId); 
       if(parentNote && parentNote.isArchived){
         note.parentDocumentId = undefined;
       }
@@ -117,7 +134,7 @@ export class DirectoryNotes{
       await this.updateNotes(note);
       for(const item of this.notes){
         if(item.parentDocumentId === noteId){
-          await this.restoreNote(item.noteId);
+          await this.restoreNote(item.id);
         }
       }
     }
@@ -127,13 +144,13 @@ export class DirectoryNotes{
   }
   
     async archivedNote(noteId: string){
-      if(this.updateMap.has(noteId)){
-        const note: Note = this.updateMap.get(noteId);
+      if(this.hashNotes.has(noteId)){
+        const note: Note = this.hashNotes.get(noteId);
         note.isArchived = true;
         this.updateNotes(note);
         for(const item of this.notes){
           if(item.parentDocumentId === noteId){
-            await this.archivedNote(item.noteId);
+            await this.archivedNote(item.id);
           }
         }
       }
@@ -141,7 +158,6 @@ export class DirectoryNotes{
         throw new Error("Ошибка архивации документа");
       }
     }
-    
     
     async sidebar(userId: string, parentDocumentId: string){
       const resultArr = [];
@@ -154,24 +170,26 @@ export class DirectoryNotes{
     }
 
     async getIdNotes(noteId: string){
-      return this.updateMap.get(noteId);
+      return this.hashNotes.get(noteId);
     }
 
-    async updateNotes({ noteId, title, content, isPublished, icon, coverImage}: IUpdateProps){
-      if(this.updateMap.has(noteId)){
-        const item: IUpdateProps = this.updateMap.get(noteId);
+    async updateNotes({ id, title, content, isPublished, icon, coverImage}: IUpdateProps){
+      if(this.hashNotes.has(id)){
+        this.listOP.handleSetSyncStatusFalse();
+        const item: IUpdateProps = this.hashNotes.get(id);
         if(title !== undefined) item.title = title;
         if(content !== undefined) item.content = content;
         if(icon !== undefined) item.icon = icon;
         if(coverImage !== undefined) item.coverImage = coverImage;
         item.isPublished = isPublished;
         await this.editNoteDirectory(item);
+        this.listOP.writeOperationFile(new Operation(item as Note, TypeOperations.PUT));
         return;
       }
       else{
         this.notes.find(async (item) => {
-          if(item.noteId === noteId){
-            this.updateMap.set(noteId, item);
+          if(item.id === id){
+            this.hashNotes.set(id, item);
             await this.updateNotes(item);
             return;
           }
@@ -199,5 +217,11 @@ export class DirectoryNotes{
       }
      }
      return resultArr.filter((item) => item.title);
+    }
+
+    async existsNote(notesFromBrowser: Note[]){
+      notesFromBrowser.forEach((item) => {
+        this.hashNotes.has(item.id)
+      })
     }
 }

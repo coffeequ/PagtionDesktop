@@ -62,7 +62,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
    },
    GetFilePath: () => {
       return ipcRenderer.invoke("path-files");
-   }
+   },
+   StartSend: () => {
+      return ipcRenderer.invoke("start-sync")
+   },
+   StopSend: () => {
+      return ipcRenderer.invoke("stop-sync")
+   },
+   GetIsStatusSync: () => {
+      return ipcRenderer.invoke("get-current-status-sync");
+   },
+   SaveUserData: (user: any) => {
+      return ipcRenderer.invoke("save-user-data", user);
+   },
 });
 
 

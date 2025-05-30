@@ -106,15 +106,15 @@ export default function TrashBox(){
                     Страницы не были найдены
                 </p>
                 {filtredDocuments?.map((document: INote) => (
-                    <div key={document.noteId} role = "button" onClick={() => onClick(document.noteId)} className="text-sm rounded-sm w-full hover:bg-primary/5 flex items-center text-primary justify-between">
+                    <div key={document.id} role = "button" onClick={() => onClick(document.id)} className="text-sm rounded-sm w-full hover:bg-primary/5 flex items-center text-primary justify-between">
                         <span className="truncate pl-2">
                             {document.title}
                         </span>
                         <div className="flex items-center">
-                            <div onClick={(e) => onRestore(e, document.noteId)} role="button" className="rounded-sm p-2 hover:bg-neutral-200 dark:hover:bg-neutral-600">
+                            <div onClick={(e) => onRestore(e, document.id)} role="button" className="rounded-sm p-2 hover:bg-neutral-200 dark:hover:bg-neutral-600">
                                 <Undo className="w-4 h-4 text-muted-foreground"/>
                             </div>
-                            <ConfirmModal onConfirm={() => onRemove(document.noteId)}>
+                            <ConfirmModal onConfirm={() => onRemove(document.id)}>
                                 <div role="button" className="rounded-sm p-2 hover:bg-neutral-200 dark:hover:bg-neutral-600">
                                     <Trash className="h-4 w-4 text-muted-foreground"/>
                                 </div>

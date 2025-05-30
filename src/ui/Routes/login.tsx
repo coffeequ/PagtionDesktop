@@ -10,6 +10,7 @@ export default function login() {
 
   useEffect(() => {
     let user = GetUser();
+    
     if(user){
       navigate("/document/startPage");
     }

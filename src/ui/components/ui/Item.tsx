@@ -71,7 +71,7 @@ export default function Item( {id, label, onClick, icon:Icon, active, expanded, 
                 else{
                     shouldRefresh();
                 }
-            navigate(`/document/${document.noteId}`);
+            navigate(`/document/${document.id}`);
         });
 
         toast.promise(promise, {

@@ -26,7 +26,7 @@ export default function Publish({ initialData } : IPublishProps) {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const url = `${origin}/preview/${initialData.noteId}`;
+    const url = `${origin}/preview/${initialData.id}`;
 
     function onPublished() {
 

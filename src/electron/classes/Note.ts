@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid"
 export class Note{
 
     constructor(title: string, userId: string, parentDocumentId?: string) {
-        this.noteId = uuidv4();
+        this.id = uuidv4();
         this.userId = userId;
         this.title = title;
         this.parentDocumentId = parentDocumentId;
@@ -11,7 +11,7 @@ export class Note{
 
     userId: string;
 
-    noteId: string;
+    id: string;
 
     content: string | undefined = "";
 

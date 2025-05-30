@@ -86,23 +86,23 @@ export default function DocumentList({ parentDocumentId, level = 0, collapse, is
                 Нет вложенных страниц
             </p>
             {documents.map((document) => (
-                <div key={document.noteId}>
-                        <Item id={document.noteId}
-                        onClick={() => onRedirect(document.noteId)}
+                <div key={document.id}>
+                        <Item id={document.id}
+                        onClick={() => onRedirect(document.id)}
                         label = {document.title}
                         icon = {FileIcon}
                         documentIcon={document.icon}
-                        active = {params.id === document.noteId}
+                        active = {params.id === document.id}
                         level = {level}
-                        onExpand={() => onExpand(document.noteId)}
-                        expanded = {expanded[document.noteId]}
+                        onExpand={() => onExpand(document.id)}
+                        expanded = {expanded[document.id]}
                         refreshDocuments={refreshDocuments}
                         />
                         {
                             
-                            expanded[document.noteId as string] && (
+                            expanded[document.id as string] && (
                                 <DocumentList
-                                    parentDocumentId={document.noteId}
+                                    parentDocumentId={document.id}
                                     level={level + 1}
                                     collapse={collapse}
                                     isMobile={isMobile}
