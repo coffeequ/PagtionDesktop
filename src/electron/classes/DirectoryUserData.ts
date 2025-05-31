@@ -34,8 +34,6 @@ export class UserData implements IUser{
 
         const body = JSON.stringify(userSer);
 
-        // console.log(userSer.id);
-
         try {
             this.writeFileAsync(this.filePath, body);
             return user;
@@ -44,9 +42,13 @@ export class UserData implements IUser{
         }
     }
 
-    async readUserFile(): Promise<UserData> { 
-        const raw = await this.readFileAsync(this.filePath, "utf-8");
-        const userData: UserData = JSON.parse(raw);
-        return userData;
+    async readUserFile(): Promise<UserData | undefined> { 
+        try {
+            const raw = await this.readFileAsync(this.filePath, "utf-8");
+            const userData: UserData = JSON.parse(raw);
+            return userData;
+        } catch {
+            return undefined
+        }
     }
 }
