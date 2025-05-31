@@ -31,6 +31,13 @@ let directoryFile = new DirectoryFile();
 let directoryUserData = new UserData();
 let directorySyncData = new DirectorySyncNote();
 
+async function fetchData(userId: string) {
+  const notes = await directorySyncData.fetchPostNote(userId)
+    if(notes.ok){
+      directorySyncData.ExistsNoteLocale(await notes.json());
+    }
+}
+
 //Главное окно приложения
 function createMainWindow(){
   mainWindow = new BrowserWindow({
@@ -55,26 +62,27 @@ app.whenReady().then(async () => {
   directoryFile.createFolder();
   directoryFile.readNameFiles();
   
+  //TODO: Данные почему-то не подтягиваются автоматически
   //Получение айди пользователя для фетчинга данных с сервера
   const userData = await directoryUserData.readUserFile();
-  
-  const res = await directorySyncData.fetchPostNote(userData.id);
 
-  if(res.ok){
-  
-    const notes: Note[] = await res.json();
-  
-    // console.log("get notes: ", notes);
-  
-    await directorySyncData.ExistsNoteLocale(notes);
+  console.log(userData);
+
+  if(userData !== undefined){
+    const res = await directorySyncData.fetchPostNote(userData.id);
+
+    if(res.ok){
+    
+      const notes: Note[] = await res.json();
+    
+      // console.log("get notes: ", notes);
+    
+      await directorySyncData.ExistsNoteLocale(notes);
+    }
   }
 
   //Чтение заметок
   directoryNotes.readNotesDirectory();
-
-  const user = await directoryUserData.readUserFile();
-
-  await directoryLO.createListOpearionFile(user.id);
   
   //Запуск основого окна
   createMainWindow();
@@ -128,10 +136,8 @@ if (!gotTheLock) {
         email: parsedUrl.searchParams.get("email")!,
         name: parsedUrl.searchParams.get("name")!,
         image: parsedUrl.searchParams.get("image")!,
-        documents: JSON.parse(parsedUrl.searchParams.get("documents")!),
       }
 
-      directorySyncData.ExistsNoteLocale(user.documents!);
       
       if (mainWindow) {
 
@@ -140,8 +146,12 @@ if (!gotTheLock) {
         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
         
         mainWindow.isFocused();
-
+        
+        fetchData(user.id);
+        
         directoryUserData.saveUserFile(user);
+
+        directoryLO.createListOpearionFile(user.id);
       }
     }
   });
@@ -156,14 +166,19 @@ app.on("open-url", (event, url) => {
     email: parsedUrl.searchParams.get("email")!,
     name: parsedUrl.searchParams.get("name")!,
     image: parsedUrl.searchParams.get("image")!,
-    documents: JSON.parse(parsedUrl.searchParams.get("documents")!),
   }
-  directorySyncData.ExistsNoteLocale(user.documents!);  
   if(mainWindow){
     mainWindow.webContents.send("deep-link", user);
+    
     mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
+    
     mainWindow.isFocused();
+
+    fetchData(user.id);
+
     directoryUserData.saveUserFile(user);
+    
+    directoryLO.createListOpearionFile(user.id);
   }  
 });
 
@@ -247,5 +262,8 @@ ipcMain.handle("stop-sync", () => {
 });
 
 ipcMain.handle("save-user-data", async (event, user: UserData) => {
+  
+  await directoryLO.createListOpearionFile(user.id);
+
   return directoryUserData.saveUserFile(user);
 })
