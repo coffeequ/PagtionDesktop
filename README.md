@@ -25,7 +25,7 @@
   npm run dist:linux // не проверено
 ```
 
-### Или просто [скачать последнюю актуальную версию](https://github.com/coffeequ/PagtionDesktop/releases/tag/v0.0.5)
+### Или просто [скачать последнюю актуальную версию](https://github.com/coffeequ/PagtionDesktop/releases/tag/v0.0.6)
 
 
 ## React + TypeScript + Vite
