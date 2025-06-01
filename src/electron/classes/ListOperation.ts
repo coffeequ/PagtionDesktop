@@ -81,7 +81,7 @@ export class DirectoryLO{
 
         const fileName: string = userId;
 
-        // console.log("fileName: ", fileName);
+        console.log("fileName: ", fileName);
 
         this.filePath = `${this.folderPath}/${fileName}.json`;
         

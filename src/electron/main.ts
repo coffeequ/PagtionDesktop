@@ -34,7 +34,8 @@ let directorySyncData = new DirectorySyncNote();
 async function fetchData(userId: string) {
   const notes = await directorySyncData.fetchPostNote(userId)
     if(notes.ok){
-      await directorySyncData.ExistsNoteLocale(await notes.json());
+      const notesParse: Note[] = await notes.json();
+      await directorySyncData.WriteFetchNotes(notesParse);
     }
 }
 
@@ -62,12 +63,10 @@ app.whenReady().then(async () => {
   directoryFile.createFolder();
   directoryFile.readNameFiles();
   
-  //TODO: Данные почему-то не подтягиваются автоматически
-  //Получение айди пользователя для фетчинга данных с сервера
+  //Чтение user id
   const userData = await directoryUserData.readUserFile();
 
-  console.log(userData);
-
+  //Проверка на существование его
   if(userData !== undefined){
     const res = await directorySyncData.fetchPostNote(userData.id);
 
@@ -77,7 +76,7 @@ app.whenReady().then(async () => {
     
       // console.log("get notes: ", notes);
     
-      await directorySyncData.ExistsNoteLocale(notes);
+      await directorySyncData.WriteFetchNotes(notes);
     }
   }
 
@@ -188,7 +187,7 @@ ipcMain.handle("read-notes", async () => {
 });
 
 
-ipcMain.handle("create-notes", async (event, title: string, userId: string, parentDocumentId?: string) => {
+ipcMain.handle("create-notes", async (event, title: string, userId: string, parentDocumentId: string | null) => {
   const note = new Note(title, userId, parentDocumentId);
   const newNote = directoryNotes.createNotesDirectory(note);
   return newNote;

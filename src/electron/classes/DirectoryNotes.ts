@@ -128,7 +128,7 @@ export class DirectoryNotes{
       const note: Note = this.hashNotes.get(noteId);
       const parentNote: Note = this.hashNotes.get(note.parentDocumentId); 
       if(parentNote && parentNote.isArchived){
-        note.parentDocumentId = undefined;
+        note.parentDocumentId = null;
       }
       note.isArchived = false;
       await this.updateNotes(note);
@@ -159,10 +159,14 @@ export class DirectoryNotes{
       }
     }
     
-    async sidebar(userId: string, parentDocumentId: string){
+    async sidebar(userId: string, parentDocumentId: string | null){
+      const arg = parentDocumentId ?? null;
       const resultArr = [];
       for (let i = 0; i < this.notes.length; i++) {
-        if(this.notes[i].isArchived === false && this.notes[i].userId === userId && (this.notes[i].parentDocumentId === parentDocumentId || this.notes[i].parentDocumentId === null)){
+        console.log("parametr: ", parentDocumentId);
+        console.log("this.notes[i] - title: ", this.notes[i].title);
+        console.log("this.notes[i] - parents: ", this.notes[i].parentDocumentId);
+        if(this.notes[i].isArchived === false && this.notes[i].userId === userId && (this.notes[i].parentDocumentId ?? null) === arg){
           resultArr.push(this.notes[i]);
         }
       }

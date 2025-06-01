@@ -6,14 +6,7 @@ import { ChevronDown, ChevronRight, LucideIcon, MoreHorizontal, Plus, Trash } fr
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { INote } from "@/interfaces/INote";
-
-interface IUser {
-    id: string,
-    email: string,
-    name: string,
-    image: string | null
-}
-
+import { GetUser } from "@/actions/user";
 
 interface ItemProps {
     id?: string;
@@ -35,9 +28,7 @@ export default function Item( {id, label, onClick, icon:Icon, active, expanded, 
 
     const shouldRefresh = useRefreshStore((state) => state.triggerRefresh);
 
-    const getUser = localStorage.getItem("user");
-
-    const user: IUser = JSON.parse(getUser as string);
+    const user = GetUser();
 
     const onArchive = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         event.stopPropagation();
@@ -47,6 +38,7 @@ export default function Item( {id, label, onClick, icon:Icon, active, expanded, 
             navigate(`/document/startPage`);
             refreshDocuments?.();
         });
+        
         toast.promise(promise, {
             loading: "Перемещение в мусорку...",
             success: "Страница была перемещена в корзину!",

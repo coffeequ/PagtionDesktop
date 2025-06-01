@@ -3,7 +3,6 @@ import { IUser } from "../interfaces/IUser.js";
 import path from "path";
 import { existsSync, mkdirSync, readFile, writeFile } from "fs";
 import { promisify } from "util";
-import { DirectoryLO } from "./ListOperation.js";
 
 export class UserData implements IUser{
     id: string = "";
