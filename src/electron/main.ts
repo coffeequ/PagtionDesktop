@@ -66,8 +66,14 @@ app.whenReady().then(async () => {
   //Чтение user id
   const userData = await directoryUserData.readUserFile();
 
+  // console.log(userData?.id);
+
+  // console.log("userData !== undefined", userData !== undefined);
+
   //Проверка на существование его
   if(userData !== undefined){
+    directoryLO.handlSetFilePath(userData.id);
+    // console.log("directoryLO.filePath: ", directoryLO.filePath);
     const res = await directorySyncData.fetchPostNote(userData.id);
 
     if(res.ok){
@@ -137,7 +143,6 @@ if (!gotTheLock) {
         image: parsedUrl.searchParams.get("image")!,
       }
 
-      
       if (mainWindow) {
 
         mainWindow.webContents.send("deep-link", user);
@@ -262,6 +267,8 @@ ipcMain.handle("stop-sync", () => {
 
 ipcMain.handle("save-user-data", async (event, user: UserData) => {
   
+  directoryLO.handlSetFilePath(user.id);
+
   await directoryLO.createListOpearionFile(user.id);
 
   fetchData(user.id);

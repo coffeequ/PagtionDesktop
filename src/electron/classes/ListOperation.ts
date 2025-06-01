@@ -19,7 +19,7 @@ export class DirectoryLO{
 
     private folderPath: string = path.join(this.userPath, "ListOperaion");
 
-    private filePath: string = " ";
+    filePath: string = " ";
 
     private timer: NodeJS.Timeout | null = null;
 
@@ -41,7 +41,7 @@ export class DirectoryLO{
 
     private handleFetchData = async (operation: Operation) => {
        try {
-         const res = await net.fetch("https://pagtion.vercel.app/api/remoteSync", {
+         const res = await net.fetch("https://pagtion.vercel.app//api/remoteSync", {
                 method: operation.typeOperation,
                 headers: {
                     "Content-Type": "Application/json"

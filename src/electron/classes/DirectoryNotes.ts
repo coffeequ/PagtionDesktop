@@ -69,7 +69,6 @@ export class DirectoryNotes{
     }
       
     async createNotesDirectory(note: Note): Promise<Note> {
-      this.listOP.handlSetFilePath(note.userId);
       return new Promise((resolve, reject) => {
         const filePath = `${this.folderPath}/${note.id}.json`;
         writeFile(filePath, JSON.stringify(note), (err) => {
@@ -163,9 +162,6 @@ export class DirectoryNotes{
       const arg = parentDocumentId ?? null;
       const resultArr = [];
       for (let i = 0; i < this.notes.length; i++) {
-        console.log("parametr: ", parentDocumentId);
-        console.log("this.notes[i] - title: ", this.notes[i].title);
-        console.log("this.notes[i] - parents: ", this.notes[i].parentDocumentId);
         if(this.notes[i].isArchived === false && this.notes[i].userId === userId && (this.notes[i].parentDocumentId ?? null) === arg){
           resultArr.push(this.notes[i]);
         }
