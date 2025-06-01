@@ -34,7 +34,8 @@ let directorySyncData = new DirectorySyncNote();
 async function fetchData(userId: string) {
   const notes = await directorySyncData.fetchPostNote(userId)
     if(notes.ok){
-      await directorySyncData.ExistsNoteLocale(await notes.json());
+      const notesParse: Note[] = await notes.json();
+      await directorySyncData.WriteFetchNotes(notesParse);
     }
 }
 
@@ -62,13 +63,17 @@ app.whenReady().then(async () => {
   directoryFile.createFolder();
   directoryFile.readNameFiles();
   
-  //TODO: Данные почему-то не подтягиваются автоматически
-  //Получение айди пользователя для фетчинга данных с сервера
+  //Чтение user id
   const userData = await directoryUserData.readUserFile();
 
-  console.log(userData);
+  // console.log(userData?.id);
 
+  // console.log("userData !== undefined", userData !== undefined);
+
+  //Проверка на существование его
   if(userData !== undefined){
+    directoryLO.handlSetFilePath(userData.id);
+    // console.log("directoryLO.filePath: ", directoryLO.filePath);
     const res = await directorySyncData.fetchPostNote(userData.id);
 
     if(res.ok){
@@ -77,7 +82,7 @@ app.whenReady().then(async () => {
     
       // console.log("get notes: ", notes);
     
-      await directorySyncData.ExistsNoteLocale(notes);
+      await directorySyncData.WriteFetchNotes(notes);
     }
   }
 
@@ -138,7 +143,6 @@ if (!gotTheLock) {
         image: parsedUrl.searchParams.get("image")!,
       }
 
-      
       if (mainWindow) {
 
         mainWindow.webContents.send("deep-link", user);
@@ -188,7 +192,7 @@ ipcMain.handle("read-notes", async () => {
 });
 
 
-ipcMain.handle("create-notes", async (event, title: string, userId: string, parentDocumentId?: string) => {
+ipcMain.handle("create-notes", async (event, title: string, userId: string, parentDocumentId: string | null) => {
   const note = new Note(title, userId, parentDocumentId);
   const newNote = directoryNotes.createNotesDirectory(note);
   return newNote;
@@ -263,6 +267,8 @@ ipcMain.handle("stop-sync", () => {
 
 ipcMain.handle("save-user-data", async (event, user: UserData) => {
   
+  directoryLO.handlSetFilePath(user.id);
+
   await directoryLO.createListOpearionFile(user.id);
 
   fetchData(user.id);

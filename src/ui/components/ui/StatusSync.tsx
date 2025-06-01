@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Button } from "./button";
-import { Check, FileWarning } from "lucide-react";
+import { Check, FileWarning, Folder } from "lucide-react";
 import Spinner from "./spinner";
+import { GetStatusSync } from "@/actions/statusSync";
 
 
 export default function StatusSync(){
@@ -9,12 +10,15 @@ export default function StatusSync(){
     //@ts-ignore
     const [isSync, setIsSync] = useState<IStatusSync>("True");
 
+    const [isSyncStatus, setIsSyncStatus] = useState(GetStatusSync());
+
     useEffect(() => {
         const fetchData = async () => {
             try{
                 //@ts-ignore
                 const status = await window.electronAPI.GetIsStatusSync();
                 setIsSync(status);
+                setIsSyncStatus(GetStatusSync());
                 console.log("status sync:", status);
             } catch {
                 console.log("Get status");
@@ -32,26 +36,37 @@ export default function StatusSync(){
     return(
         <Button variant="ghost" disabled={ true } >
             {
-                isSync === "True" && (
-                    <span>
-                        <Check/>
+                !isSyncStatus ? (
+                    <span className="flex flex-row items-center justify-center">
+                        Синхронизации выкл
+                        < Folder className="ml-2"/>
                     </span>
-                )
-            }
-            {
-                isSync === "False" && (
-                    <span>
-                        <Spinner/>
-                    </span>
-                )
-            }
+                ):(
+                    <div>
+                        {
+                        isSync === "True" && (
+                            <span>
+                                <Check/>
+                            </span>
+                        )
+                    }
+                    {
+                        isSync === "False" && (
+                            <span>
+                                <Spinner/>
+                            </span>
+                        )
+                    }
 
-            {
-                isSync === "Error" && (
-                    <span className="flex flex-col">
-                        Ошибка синхронизации
-                        <FileWarning className="mr-2"/>
-                    </span>
+                    {
+                        isSync === "Error" && (
+                            <span className="flex flex-col">
+                                Ошибка синхронизации
+                                <FileWarning className="mr-2"/>
+                            </span>
+                        )
+                    }
+                    </div>
                 )
             }
         </Button>

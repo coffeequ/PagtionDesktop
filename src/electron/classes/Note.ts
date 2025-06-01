@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid"
 
 export class Note{
 
-    constructor(title: string, userId: string, parentDocumentId?: string) {
+    constructor(title: string, userId: string, parentDocumentId: string | null) {
         this.id = uuidv4();
         this.userId = userId;
         this.title = title;
@@ -19,7 +19,7 @@ export class Note{
 
     isArchived: boolean = false;
 
-    parentDocumentId: string | undefined = "";
+    parentDocumentId: string | null = null;
 
     icon: string | undefined;
 

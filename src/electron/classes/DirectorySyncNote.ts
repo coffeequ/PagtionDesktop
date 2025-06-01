@@ -10,13 +10,11 @@ export class DirectorySyncNote{
 
   private folderPath: string = path.join(this.userPath, "Notes");
 
-  private statusWeb: boolean = false;
-
   GetFolderNotePath(): string {
     return this.folderPath;
   }
     
-  public async ExistsNoteLocale(notes: Note[]){
+  public async WriteFetchNotes(notes: Note[]){
     const promiseWrite = notes.map((item) => {
       const filePath = `${this.folderPath}/${item.id}.json`;
           writeFile(filePath, JSON.stringify(item), (err) => {
@@ -31,7 +29,7 @@ export class DirectorySyncNote{
 
   public async fetchPostNote(id: string): Promise<Response>{
     try {
-        const res = await net.fetch("https://pagtion.vercel.app/api/getNote", {
+        const res = await net.fetch("https://pagtion.vercel.app//api/getNote", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
