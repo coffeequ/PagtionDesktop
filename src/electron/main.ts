@@ -34,7 +34,7 @@ let directorySyncData = new DirectorySyncNote();
 async function fetchData(userId: string) {
   const notes = await directorySyncData.fetchPostNote(userId)
     if(notes.ok){
-      directorySyncData.ExistsNoteLocale(await notes.json());
+      await directorySyncData.ExistsNoteLocale(await notes.json());
     }
 }
 
@@ -264,6 +264,8 @@ ipcMain.handle("stop-sync", () => {
 ipcMain.handle("save-user-data", async (event, user: UserData) => {
   
   await directoryLO.createListOpearionFile(user.id);
+
+  fetchData(user.id);
 
   return directoryUserData.saveUserFile(user);
 })

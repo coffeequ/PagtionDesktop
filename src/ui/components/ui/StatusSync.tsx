@@ -17,7 +17,7 @@ export default function StatusSync(){
                 setIsSync(status);
                 console.log("status sync:", status);
             } catch {
-                console.log("Ошибка получения статуса");
+                console.log("Get status");
             }
         }
         fetchData();

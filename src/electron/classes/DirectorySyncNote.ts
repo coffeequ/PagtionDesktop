@@ -17,7 +17,6 @@ export class DirectorySyncNote{
   }
     
   public async ExistsNoteLocale(notes: Note[]){
-    // console.log("Метод сработал. Все полученные заметки:", notes);
     const promiseWrite = notes.map((item) => {
       const filePath = `${this.folderPath}/${item.id}.json`;
           writeFile(filePath, JSON.stringify(item), (err) => {

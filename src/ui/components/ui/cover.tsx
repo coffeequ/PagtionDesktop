@@ -22,7 +22,7 @@ export default function Cover({ preview, url } : ICoverProps){
 
     async function onRemove () {
         //@ts-ignore
-        await window.electronAPI.updateNote({noteId: id, coverImage: ""});
+        await window.electronAPI.updateNote({id, coverImage: ""});
         setCoverImage("");
     }
     
