@@ -91,6 +91,8 @@ app.whenReady().then(async () => {
   
   //Запуск основого окна
   createMainWindow();
+
+  mainWindow.focus();
 });
 
 //Создание кастомного протокола на macOS
@@ -149,7 +151,7 @@ if (!gotTheLock) {
         
         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
         
-        mainWindow.isFocused();
+        mainWindow.focus();
         
         fetchData(user.id);
         
@@ -176,7 +178,7 @@ app.on("open-url", (event, url) => {
     
     mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
     
-    mainWindow.isFocused();
+    mainWindow.focus();
 
     fetchData(user.id);
 
