@@ -1,4 +1,6 @@
 
+## Приложение работает в связке с [веб Pagtion](https://github.com/coffeequ/Pagtion)
+
 ### Для работы нужно склонировать репозиторий
 ```
   git clone https://github.com/coffeequ/PagtionDesktop
