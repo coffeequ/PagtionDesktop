@@ -27,7 +27,7 @@ export default function login() {
         
         navigate("/document/startPage");
     });
-    triggerRefresh();
+    // triggerRefresh();
   }
 }, [])
   
