@@ -1,4 +1,6 @@
 
+## Приложение работает в связке с [веб Pagtion](https://github.com/coffeequ/Pagtion)
+
 ### Для работы нужно склонировать репозиторий
 ```
   git clone https://github.com/coffeequ/PagtionDesktop
@@ -25,7 +27,7 @@
   npm run dist:linux // не проверено
 ```
 
-### Или просто [скачать последнюю актуальную версию](https://github.com/coffeequ/PagtionDesktop/releases/tag/v0.0.6)
+### Или просто [скачать последнюю актуальную версию](https://github.com/coffeequ/PagtionDesktop/releases/tag/v0.0.7)
 
 
 ## React + TypeScript + Vite
