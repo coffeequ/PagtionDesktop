@@ -182,7 +182,7 @@ export class DirectoryNotes{
         if(content !== undefined) item.content = content;
         if(icon !== undefined) item.icon = icon;
         if(coverImage !== undefined) item.coverImage = coverImage;
-        item.isPublished = isPublished;
+        if(isPublished !== undefined) item.isPublished = isPublished;
         await this.editNoteDirectory(item);
         this.listOP.writeOperationFile(new Operation(item as Note, TypeOperations.PUT));
         return;
