@@ -19,18 +19,15 @@ export default function login() {
     }
     else{
       //@ts-ignore
-      user = window.electronAPI.syncDeepLinkGoogle((event, data) => {
+      user = window.electronAPI.syncDeepLinkGoogle(async (event, data) => {
         localStorage.removeItem("user");
         localStorage.setItem("user", JSON.stringify(data));
+
         triggerRefresh();
-        //@ts-ignore
+        
         navigate("/document/startPage");
     });
-    const refresh = async () => {
-      //@ts-ignore
-      await window.electronAPI.RefreshNotesAfterLogin()
-    }
-    refresh();
+    triggerRefresh();
   }
 }, [])
   

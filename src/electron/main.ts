@@ -18,10 +18,6 @@ import { directoryLO } from './classes/ListOperation.js';
 
 type Theme = "dark" | "light";
 
-//TODO: 
-// 1) Сделать проверку подключения к серверу используя его api. Уточнее: сделать эндпоинт для получения состояния.
-
-
 //Remind: В продакшене использовать две .., в дев .
 let mainWindow: BrowserWindow;
 
@@ -55,8 +51,6 @@ function createMainWindow(){
 
   mainWindow.menuBarVisible = false;
 }
-
-
 
 //Создание кастомного протокола на macOS
 app.setAsDefaultProtocolClient("pagtion");
@@ -109,16 +103,16 @@ if (!gotTheLock) {
       }
 
       if (mainWindow) {
-
-        mainWindow.webContents.send("deep-link", user);
         
         await fetchData(user.id);
-
-        await directoryNotes.readNotesDirectory();
         
         await directoryUserData.saveUserFile(user);
 
         await directoryLO.createListOpearionFile(user.id);
+
+        await directoryNotes.readNotesDirectory();
+
+        mainWindow.webContents.send("deep-link", user);
 
         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
         
@@ -139,20 +133,20 @@ app.on("open-url", async (event, url) => {
     image: parsedUrl.searchParams.get("image")!,
   }
   if(mainWindow){
-    mainWindow.webContents.send("deep-link", user);
 
     await fetchData(user.id);
-
-    await directoryNotes.readNotesDirectory();
 
     await directoryUserData.saveUserFile(user);
     
     await directoryLO.createListOpearionFile(user.id);
+
+    await directoryNotes.readNotesDirectory();
+
+    mainWindow.webContents.send("deep-link", user);
     
     mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
     
     mainWindow.focus();
-
   }  
 });
 
@@ -188,7 +182,7 @@ ipcMain.handle("restore-notes", async (event, noteId: string) => {
 });
 
 ipcMain.handle("sidebar-notes", async (event, userId: string, parentDocumentId: string) => {
-  console.log("directoryNotes.sidebar(userId, parentDocumentId)", await directoryNotes.sidebar(userId, parentDocumentId));
+  console.log("directoryNotes.sidebar(userId, parentDocumentId)", (await directoryNotes.sidebar(userId, parentDocumentId)).length);
   return await directoryNotes.sidebar(userId, parentDocumentId);
 });
 
