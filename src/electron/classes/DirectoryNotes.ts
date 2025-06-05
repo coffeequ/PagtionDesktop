@@ -159,6 +159,7 @@ export class DirectoryNotes{
     }
     
     async sidebar(userId: string, parentDocumentId: string | null){
+      // await this.readNotesDirectory();
       const arg = parentDocumentId ?? null;
       const resultArr = [];
       for (let i = 0; i < this.notes.length; i++) {

@@ -19,10 +19,13 @@ import { FormError } from "./form-error"
 import { FormSucces } from "./form-success"
 import { useState, useTransition } from "react"
 import { SetStatusSync } from "@/actions/statusSync"
+import useRefreshStore from "@/hooks/use-refresh"
 
 export default function LoginForm(){
 
     const navigate = useNavigate();
+
+    const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
 
     const [isPading, startTransition] = useTransition();
     const [error, setError] = useState<string | undefined>("");
@@ -55,13 +58,17 @@ export default function LoginForm(){
                         }),
                     });
                 if(response.ok) {
-                    response.json().then((item) => {
-                    window.localStorage.setItem("user", JSON.stringify(item));
-                    //@ts-ignore
-                    window.electronAPI.SaveUserData(item);
-                    SetStatusSync(false);
-                    setSuccess("Авторизация прошла успешно!");
-                    navigate("/document/startPage");});
+                    response.json().then(async (item) => {
+                        window.localStorage.setItem("user", JSON.stringify(item));
+                        //@ts-ignore
+                        await window.electronAPI.SaveUserData(item);
+                        //@ts-ignore
+                        await window.electronAPI.RefreshNotesAfterLogin()
+                        SetStatusSync(false);
+                        setSuccess("Авторизация прошла успешно!");
+                        triggerRefresh();
+                        navigate("/document/startPage");
+                    });
                     return;
                 } else {
                     const fetchData = async () =>{

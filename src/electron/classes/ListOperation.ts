@@ -1,11 +1,10 @@
 import { app, net } from "electron";
-import { existsSync, mkdirSync, promises, readFile, writeFile } from "fs";
+import { existsSync, mkdirSync, readFile, writeFile } from "fs";
 import path from "path";
 import { Operation } from "./Operation.js";
 import { promisify } from "util";
 import { IOperationQueue } from "../interfaces/IOperationQueue.js";
 import { TypeOperations } from "../enums/TypeOperation.js";
-import { UserData } from "./DirectoryUserData.js";
 import { TypeStatusSync } from "../enums/TypeSync.js";
 
 
@@ -132,6 +131,7 @@ export class DirectoryLO{
     }
 
     //Метод для отправки операций
+    //Попрбовать исправить как-нибудь case при котором заметки нет на сервере, но она есть на клиенте
     private async sendOperationLoop(){
         if(this.isStatusSend){
             await this.readOpeartionFile();

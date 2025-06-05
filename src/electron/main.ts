@@ -56,44 +56,7 @@ function createMainWindow(){
   mainWindow.menuBarVisible = false;
 }
 
-//Создание окна при загрузки приложения
-app.whenReady().then(async () => {
 
-  //Чтение файлов
-  directoryFile.createFolder();
-  directoryFile.readNameFiles();
-  
-  //Чтение user id
-  const userData = await directoryUserData.readUserFile();
-
-  // console.log(userData?.id);
-
-  // console.log("userData !== undefined", userData !== undefined);
-
-  //Проверка на существование его
-  if(userData !== undefined){
-    directoryLO.handlSetFilePath(userData.id);
-    // console.log("directoryLO.filePath: ", directoryLO.filePath);
-    const res = await directorySyncData.fetchPostNote(userData.id);
-
-    if(res.ok){
-    
-      const notes: Note[] = await res.json();
-    
-      // console.log("get notes: ", notes);
-    
-      await directorySyncData.WriteFetchNotes(notes);
-    }
-  }
-
-  //Чтение заметок
-  directoryNotes.readNotesDirectory();
-  
-  //Запуск основого окна
-  createMainWindow();
-
-  mainWindow.focus();
-});
 
 //Создание кастомного протокола на macOS
 app.setAsDefaultProtocolClient("pagtion");
@@ -129,7 +92,7 @@ const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
 } else {
-  app.on('second-instance', (event, argv, workingDirectory) => {
+  app.on('second-instance', async (event, argv, workingDirectory) => {
     const deepLink = argv.find(arg => arg.startsWith('pagtion://'));
     if (deepLink) {
       //console.log("Получен deep link (в second-instance):", deepLink);
@@ -149,21 +112,23 @@ if (!gotTheLock) {
 
         mainWindow.webContents.send("deep-link", user);
         
+        await fetchData(user.id);
+
+        await directoryNotes.readNotesDirectory();
+        
+        await directoryUserData.saveUserFile(user);
+
+        await directoryLO.createListOpearionFile(user.id);
+
         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
         
         mainWindow.focus();
-        
-        fetchData(user.id);
-        
-        directoryUserData.saveUserFile(user);
-
-        directoryLO.createListOpearionFile(user.id);
       }
     }
   });
 }
 //Получение глубокой ссылки с macOS
-app.on("open-url", (event, url) => {
+app.on("open-url", async (event, url) => {
   event.preventDefault();
   //console.log("Получен deep link:", url);
   const parsedUrl = new URL(url);
@@ -175,16 +140,19 @@ app.on("open-url", (event, url) => {
   }
   if(mainWindow){
     mainWindow.webContents.send("deep-link", user);
+
+    await fetchData(user.id);
+
+    await directoryNotes.readNotesDirectory();
+
+    await directoryUserData.saveUserFile(user);
+    
+    await directoryLO.createListOpearionFile(user.id);
     
     mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
     
     mainWindow.focus();
 
-    fetchData(user.id);
-
-    directoryUserData.saveUserFile(user);
-    
-    directoryLO.createListOpearionFile(user.id);
   }  
 });
 
@@ -220,7 +188,8 @@ ipcMain.handle("restore-notes", async (event, noteId: string) => {
 });
 
 ipcMain.handle("sidebar-notes", async (event, userId: string, parentDocumentId: string) => {
-  return directoryNotes.sidebar(userId, parentDocumentId);
+  console.log("directoryNotes.sidebar(userId, parentDocumentId)", await directoryNotes.sidebar(userId, parentDocumentId));
+  return await directoryNotes.sidebar(userId, parentDocumentId);
 });
 
 ipcMain.handle("archived-notes", async (event, noteId: string) => {
@@ -273,7 +242,53 @@ ipcMain.handle("save-user-data", async (event, user: UserData) => {
 
   await directoryLO.createListOpearionFile(user.id);
 
-  fetchData(user.id);
+  await fetchData(user.id);
 
   return directoryUserData.saveUserFile(user);
-})
+});
+
+ipcMain.handle("refresh-notes-after-login", async () => {
+  await directoryNotes.readNotesDirectory();
+  console.log("directoryNotes.notes", directoryNotes.notes.length);
+  return true;
+});
+
+
+//Создание окна при загрузки приложения
+app.whenReady().then(async () => {
+
+  //Чтение файлов
+  directoryFile.createFolder();
+  await directoryFile.readNameFiles();
+  
+  //Чтение user id
+  const userData = await directoryUserData.readUserFile();
+
+  // console.log(userData?.id);
+
+  // console.log("userData !== undefined", userData !== undefined);
+
+  //Проверка на существование его
+  if(userData !== undefined){
+    directoryLO.handlSetFilePath(userData.id);
+    // console.log("directoryLO.filePath: ", directoryLO.filePath);
+    const res = await directorySyncData.fetchPostNote(userData.id);
+
+    if(res.ok){
+    
+      const notes: Note[] = await res.json();
+    
+      // console.log("get notes: ", notes);
+    
+      await directorySyncData.WriteFetchNotes(notes);
+    }
+  }
+
+  //Чтение заметок
+  await directoryNotes.readNotesDirectory();
+
+  //Запуск основого окна
+  createMainWindow();
+
+  mainWindow.focus();
+});
