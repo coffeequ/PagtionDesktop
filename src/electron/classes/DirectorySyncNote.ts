@@ -2,6 +2,7 @@ import { app, net } from "electron";
 import path from "path";
 import { Note } from "./Note.js";
 import { writeFile } from "fs";
+import { Directory } from "./Directory.js";
 
 
 export class DirectorySyncNote{
@@ -10,6 +11,8 @@ export class DirectorySyncNote{
 
   private folderPath: string = path.join(this.userPath, "Notes");
 
+  directory: Directory = new Directory();
+
   GetFolderNotePath(): string {
     return this.folderPath;
   }
@@ -17,11 +20,7 @@ export class DirectorySyncNote{
   public async WriteFetchNotes(notes: Note[]){
     const promiseWrite = notes.map((item) => {
       const filePath = `${this.folderPath}/${item.id}.json`;
-          writeFile(filePath, JSON.stringify(item), (err) => {
-          if (err) {
-            console.error(err);
-          }
-        });
+          this.directory.writeFileNote(filePath, item);
     });
 
     await Promise.all(promiseWrite);

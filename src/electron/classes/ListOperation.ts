@@ -6,6 +6,7 @@ import { promisify } from "util";
 import { IOperationQueue } from "../interfaces/IOperationQueue.js";
 import { TypeOperations } from "../enums/TypeOperation.js";
 import { TypeStatusSync } from "../enums/TypeSync.js";
+import { Directory } from "./Directory.js";
 
 
 export class DirectoryLO{
@@ -34,9 +35,7 @@ export class DirectoryLO{
         [TypeOperations.DELETE]: []
     };
 
-    private readFileAsync = promisify(readFile);
-
-    private writeFileAsync = promisify(writeFile);
+    directory: Directory = new Directory();
 
     private handleFetchData = async (operation: Operation) => {
        try {
@@ -91,7 +90,7 @@ export class DirectoryLO{
 
         try {
             if(!existsSync(this.filePath)){
-                await this.writeFileAsync(this.filePath, JSON.stringify(this.operationQueue));
+                await this.directory.writeFileObj(this.filePath, JSON.stringify(this.operationQueue));
             }
         } catch {
             throw new Error("Error create queue list for this user!");
@@ -112,7 +111,7 @@ export class DirectoryLO{
         const body = JSON.stringify(this.operationQueue);
 
         try {
-            await this.writeFileAsync(this.filePath, body);
+            await this.directory.writeFileObj(this.filePath, body);
         } catch {
             throw new Error("Error write note!");
         }
@@ -122,8 +121,9 @@ export class DirectoryLO{
     async readOpeartionFile(){
         // console.log("this.filePath read-opration: ", this.filePath);
         try {
-            const data = await this.readFileAsync(this.filePath, "utf-8");
-            const parseData = JSON.parse(data);
+            const data = await this.directory.readFile(this.filePath);
+            console.log(data);
+            const parseData: IOperationQueue = JSON.parse(data);
             this.operationQueue = parseData;
         } catch {
             throw new Error("Read file async");
@@ -153,7 +153,7 @@ export class DirectoryLO{
                         }
                         this.handleSetSyncStatusTrue();
                         const body = JSON.stringify(this.operationQueue);
-                        await this.writeFileAsync(this.filePath, body, { encoding: "utf-8" });
+                        await this.directory.writeFileObj(this.filePath, body);
                     }
                 }
             }
