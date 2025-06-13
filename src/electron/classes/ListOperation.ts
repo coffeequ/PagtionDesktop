@@ -104,7 +104,7 @@ export class DirectoryLO{
         try {
             await this.readOpeartionFile();
         } catch (e) {
-            console.warn("Could not read operation file before writing, using current queue.", e);
+            throw new Error("Read operations file!");
         }
 
         this.operationQueue[operation.typeOperation].push(operation);

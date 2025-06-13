@@ -89,11 +89,8 @@ if (!gotTheLock) {
   app.on('second-instance', async (event, argv, workingDirectory) => {
     const deepLink = argv.find(arg => arg.startsWith('pagtion://'));
     if (deepLink) {
-      //console.log("Получен deep link (в second-instance):", deepLink);
 
       const parsedUrl = new URL(deepLink);
-
-      //console.log(parsedUrl);
 
       const user: IUser = {
         id: parsedUrl.searchParams.get("id")!,
@@ -124,7 +121,6 @@ if (!gotTheLock) {
 //Получение глубокой ссылки с macOS
 app.on("open-url", async (event, url) => {
   event.preventDefault();
-  //console.log("Получен deep link:", url);
   const parsedUrl = new URL(url);
   const user: IUser = {
     id: parsedUrl.searchParams.get("id")!,
@@ -182,7 +178,6 @@ ipcMain.handle("restore-notes", async (event, noteId: string) => {
 });
 
 ipcMain.handle("sidebar-notes", async (event, userId: string, parentDocumentId: string) => {
-  console.log("directoryNotes.sidebar(userId, parentDocumentId)", (await directoryNotes.sidebar(userId, parentDocumentId)).length);
   return await directoryNotes.sidebar(userId, parentDocumentId);
 });
 
@@ -243,7 +238,6 @@ ipcMain.handle("save-user-data", async (event, user: UserData) => {
 
 ipcMain.handle("refresh-notes-after-login", async () => {
   await directoryNotes.readNotesDirectory();
-  console.log("directoryNotes.notes", directoryNotes.notes.length);
   return true;
 });
 
@@ -258,21 +252,14 @@ app.whenReady().then(async () => {
   //Чтение user id
   const userData = await directoryUserData.readUserFile();
 
-  // console.log(userData?.id);
-
-  // console.log("userData !== undefined", userData !== undefined);
-
   //Проверка на существование его
   if(userData !== undefined){
     directoryLO.handlSetFilePath(userData.id);
-    // console.log("directoryLO.filePath: ", directoryLO.filePath);
     const res = await directorySyncData.fetchPostNote(userData.id);
 
     if(res.ok){
     
       const notes: Note[] = await res.json();
-    
-      // console.log("get notes: ", notes);
     
       await directorySyncData.WriteFetchNotes(notes);
     }

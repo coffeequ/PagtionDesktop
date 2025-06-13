@@ -76,7 +76,6 @@ export class DirectoryNotes{
             console.error(err);
             reject(err);
           } else {
-            //console.log("createNote: ", note);
             this.notes.push(note);
             this.listOP.writeOperationFile(new Operation(note, TypeOperations.POST));
             this.hashNotes.set(note.id, note);
