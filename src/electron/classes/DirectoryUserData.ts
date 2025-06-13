@@ -3,6 +3,7 @@ import { IUser } from "../interfaces/IUser.js";
 import path from "path";
 import { existsSync, mkdirSync, readFile, writeFile } from "fs";
 import { promisify } from "util";
+import { Directory } from "./Directory.js";
 
 export class UserData implements IUser{
     id: string = "";
@@ -16,11 +17,9 @@ export class UserData implements IUser{
 
     private fileName: string = "userData";
 
-    private readFileAsync = promisify(readFile);
-
-    private writeFileAsync = promisify(writeFile);
-
     private filePath = `${this.folderPath}/${this.fileName}.json`;
+
+    directory: Directory = new Directory();
 
     async saveUserFile(user: IUser){
         if(!existsSync(this.folderPath)){
@@ -33,17 +32,12 @@ export class UserData implements IUser{
 
         const body = JSON.stringify(userSer);
 
-        try {
-            this.writeFileAsync(this.filePath, body);
-            return user;
-        } catch {
-            throw new Error("Error save user data");
-        }
+        this.directory.writeFileObj(this.filePath, body);
     }
 
     async readUserFile(): Promise<UserData | undefined> { 
         try {
-            const raw = await this.readFileAsync(this.filePath, "utf-8");
+            const raw = await this.directory.readFile(this.filePath);
             const userData: UserData = JSON.parse(raw);
             return userData;
         } catch {

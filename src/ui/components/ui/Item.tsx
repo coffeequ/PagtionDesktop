@@ -54,6 +54,7 @@ export default function Item( {id, label, onClick, icon:Icon, active, expanded, 
     function onCreate(event: React.MouseEvent<HTMLDivElement, MouseEvent>){
         event.stopPropagation();
         if(!id || !user.id) return;
+        
         //@ts-ignore
         const promise = window.electronAPI.createNote("Untitled", user.id, id)
             .then((document: INote) => {

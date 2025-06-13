@@ -25,7 +25,7 @@ export default function StartDocumentPage() {
         if(!user){
             throw new Error("Не найден id пользователя!");
         }
-
+        debugger
         //@ts-ignore
         const newNote = window.electronAPI.createNote("Untitled", user.id, undefined).then((item) => {
             const result: INote = item
