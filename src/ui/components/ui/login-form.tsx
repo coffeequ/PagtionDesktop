@@ -18,7 +18,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { FormError } from "./form-error"
 import { FormSucces } from "./form-success"
 import { useState, useTransition } from "react"
-import { SetStatusSync } from "@/actions/statusSync"
+
 import useRefreshStore from "@/hooks/use-refresh"
 
 export default function LoginForm(){
@@ -64,7 +64,6 @@ export default function LoginForm(){
                         await window.electronAPI.SaveUserData(item);
                         //@ts-ignore
                         await window.electronAPI.RefreshNotesAfterLogin()
-                        SetStatusSync(false);
                         setSuccess("Авторизация прошла успешно!");
                         triggerRefresh();
                         navigate("/document/startPage");

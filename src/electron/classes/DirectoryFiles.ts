@@ -16,7 +16,6 @@ export class DirectoryFile{
     }
     
     createFolder(): void {
-        //console.log(this.filesFolderPath);
         if(!existsSync(this.filesFolderPath)){
             mkdirSync(this.filesFolderPath, { recursive: true });
         }
@@ -27,14 +26,11 @@ export class DirectoryFile{
         files.forEach((item) => {
             this.filesNameMap.set(item, "");
         });
-        //console.log(this.filesNameMap);
         return;
     }
 
     async handleUpload({ name, arrayBuffer }: IFilesUpload): Promise<string>{
         
-        //console.log("File: ", name);
-
         if(this.filesNameMap.has(name)){
             let [editText, format] = name.split(".");
             editText += ` (${this.index})`;
@@ -43,22 +39,16 @@ export class DirectoryFile{
 
         const fileName = name;
 
-        //console.log("fileName: ", fileName);
-
         const filePath = path.join(this.filesFolderPath, fileName);
-
-        //console.log("filePath: ", filePath);
 
         const buffer = Buffer.from(arrayBuffer);
 
         return new Promise((resolve, reject) => {
             writeFile(filePath, buffer, (err) => {
                 if(err){
-                    //console.log(err);
                     reject(err);
                 }
                 else{
-                    //console.log(`file://${filePath}`);
                     this.index++;
                     resolve(`file://${filePath}`);
                 }

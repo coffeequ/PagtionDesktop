@@ -27,37 +27,25 @@ let directoryFile = new DirectoryFile();
 let directoryUserData = new UserData();
 let directorySyncData = new DirectorySyncNote();
 
-// async function fetchData(userId: string) {
-//   const notes = await directorySyncData.fetchPostNote(userId)
-//     if(notes.ok){
-//       const notesParse: Note[] = await notes.json();
-//       await directorySyncData.WriteFetchNotes(notesParse);
-//     }
-// }
-
 async function LoadData(userId: string){
 
-  console.log("1");
   //Чтение файлов
   directoryFile.createFolder();
   await directoryFile.readNameFiles();
 
-  console.log("2");
   //Установка наименование пути для очереди изменений
   directoryLO.handlSetFilePath(userId);
 
-  console.log("3");
   //Получение заметок с сервера
   const res = await directorySyncData.fetchPostNote(userId);
 
     if(res.ok){
-    
       const notes: Note[] = await res.json();
       
       //Запись полученных заметок
       await directorySyncData.WriteFetchNotes(notes);
     }
-  console.log("4");
+
   //Чтение всех заметок
   await directoryNotes.readNotesDirectory();
 }
@@ -128,13 +116,13 @@ if (!gotTheLock) {
 
       if (mainWindow) {
         
-        LoadData(user.id);
+        await LoadData(user.id);
 
         // await fetchData(user.id);
         
-        // await directoryUserData.saveUserFile(user);
+        await directoryUserData.saveUserFile(user);
 
-        // await directoryLO.createListOpearionFile(user.id);
+        await directoryLO.createListOpearionFile(user.id);
 
         // await directoryNotes.readNotesDirectory();
 
@@ -159,13 +147,13 @@ app.on("open-url", async (event, url) => {
   }
   if(mainWindow){
 
-    LoadData(user.id)
+    await LoadData(user.id)
 
     // await fetchData(user.id);
 
-    // await directoryUserData.saveUserFile(user);
+    await directoryUserData.saveUserFile(user);
     
-    // await directoryLO.createListOpearionFile(user.id);
+    await directoryLO.createListOpearionFile(user.id);
 
     // await directoryNotes.readNotesDirectory();
 
@@ -248,6 +236,14 @@ ipcMain.handle("get-current-status-sync", () => {
   return directoryLO.handleGetSyncStatus();
 });
 
+ipcMain.handle("get-current-send-status", () => {
+  return directoryLO.handleGetSendStatus();
+});
+
+ipcMain.handle("set-send-status", (event, status: boolean) => {
+  return directoryLO.handleSetSendStatus(status);
+});
+
 ipcMain.handle("start-sync", async () => {
   return directoryLO.startSendOperation();
 });
@@ -264,7 +260,7 @@ ipcMain.handle("save-user-data", async (event, user: UserData) => {
 
   await LoadData(user.id);
 
-  await directoryUserData.saveUserFile(user);
+  return await directoryUserData.saveUserFile(user);
 });
 
 ipcMain.handle("exit-user", async (event) => {
@@ -273,8 +269,6 @@ ipcMain.handle("exit-user", async (event) => {
   await directoryUserData.deleteUserInfo();
   
   await directoryLO.deleteListOperation();
-
-  directoryNotes = new DirectoryNotes();
 
 });
 
@@ -291,11 +285,8 @@ app.whenReady().then(async () => {
   const userData = await directoryUserData.readUserFile();
 
   if(userData){
-    console.log("IfElse work");
     await LoadData(userData.id);
   }
-
-  console.log("start window");
 
   //Запуск основого окна
   createMainWindow();

@@ -1,7 +1,7 @@
 import { app, net } from "electron";
 import path from "path";
 import { Note } from "./Note.js";
-import { writeFile } from "fs";
+import { existsSync, mkdirSync, writeFile } from "fs";
 
 
 export class DirectorySyncNote{
@@ -15,6 +15,9 @@ export class DirectorySyncNote{
   }
     
   public async WriteFetchNotes(notes: Note[]){
+    if(!existsSync(this.folderPath)){
+      mkdirSync(this.folderPath, { recursive: true });
+    }
     const promiseWrite = notes.map((item) => {
       const filePath = `${this.folderPath}/${item.id}.json`;
           writeFile(filePath, JSON.stringify(item), (err) => {
@@ -29,7 +32,7 @@ export class DirectorySyncNote{
 
   public async fetchPostNote(id: string): Promise<Response>{
     try {
-        const res = await net.fetch("https://pagtion.vercel.app//api/getNote", {
+        const res = await net.fetch("https://pagtion.vercel.app/api/getNote", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

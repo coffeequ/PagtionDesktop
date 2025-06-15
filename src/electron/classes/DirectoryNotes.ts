@@ -95,12 +95,10 @@ export class DirectoryNotes{
           }
           else {
             const indexDelete = this.notes.findIndex((item) => item.id === noteId);
-            // console.log("indexDelete: ", indexDelete);
             if(indexDelete === -1){
               throw new Error(`Ошибка удаления. Заметка не была найдена`);
             }
             const [deleteNote] = this.notes.splice(indexDelete, 1); 
-            // console.log("Delete note: ", [deleteNote]);
             this.listOP.writeOperationFile(new Operation(deleteNote, TypeOperations.DELETE));
             this.hashNotes.delete(deleteNote.id);
             resolve(deleteNote);
@@ -200,13 +198,11 @@ export class DirectoryNotes{
 
     async trashNote(userId: string){
       const trash: Note[] = [];
-      // console.log("notes: ", this.notes);
       this.notes.forEach((item) => {
         if(item.isArchived === true && item.userId === userId){
           trash.push(item);
         }
       })
-      // console.log("trash: ", trash);
       return trash;
     }
 

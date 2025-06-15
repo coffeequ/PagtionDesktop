@@ -55,6 +55,15 @@ export class DirectoryLO{
        }
     }
 
+
+    handleGetSendStatus = () => {
+        return this.isStatusSend;
+    }
+
+    handleSetSendStatus = (state: boolean) => {
+        return this.isStatusSend = state;
+    }
+
     handleGetSyncStatus = () => {
         return this.statusSync;
     }
@@ -81,11 +90,8 @@ export class DirectoryLO{
 
         const fileName: string = userId;
 
-        console.log("fileName: ", fileName);
-
         this.filePath = `${this.folderPath}/${fileName}.json`;
         
-        // console.log("Method work and create list for queue!");
         if(!existsSync(this.folderPath)){
             mkdirSync(this.folderPath, {recursive: true});
         }
@@ -101,7 +107,6 @@ export class DirectoryLO{
 
     //Метод для записи операции в файл и очередь
     async writeOperationFile(operation: Operation){
-        // console.log("this.filePath write-opration: ", this.filePath);
         try {
             await this.readOpeartionFile();
         } catch (e) {
@@ -121,7 +126,6 @@ export class DirectoryLO{
 
     //Метод для чтения очереди операций
     async readOpeartionFile(){
-        // console.log("this.filePath read-opration: ", this.filePath);
         try {
             const data = await this.readFileAsync(this.filePath, "utf-8");
             const parseData = JSON.parse(data);
@@ -137,17 +141,12 @@ export class DirectoryLO{
         if(this.isStatusSend){
             await this.readOpeartionFile();
             for(const typeOp of [TypeOperations.POST, TypeOperations.PUT, TypeOperations.DELETE]){
-                // console.log("send typeOp: ", typeOp);
-                // console.log("length: ", this.operationQueue[typeOp]);
                 while(this.operationQueue[typeOp].length){
                     this.handleSetSyncStatusFalse();
-                    // console.log("length-before: ", this.operationQueue[typeOp]);
                     const op = this.operationQueue[typeOp].shift();
-                    // console.log("op-:", op);
                     if(op){
                         const res = await this.handleFetchData(op);
                         if(!res){
-                            // console.log("res-unshift: ", res);
                             this.operationQueue[typeOp].unshift(op);
                             this.handleSetSyncStatusError();
                             return;
@@ -165,13 +164,11 @@ export class DirectoryLO{
 
     async startSendOperation() {
         this.isStatusSend = true;
-        // console.log("start send operation");
         await this.sendOperationLoop();
     }
 
     stopSendOperation() {
         this.isStatusSend = false;
-        // console.log("end send operation");
         if(this.timer){
             clearTimeout(this.timer);
             this.timer = null;
