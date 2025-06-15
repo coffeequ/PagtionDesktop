@@ -5,6 +5,7 @@ import { Note } from "./Note.js";
 import { IUpdateProps } from "../interfaces/IUpdateNote.js";
 import { Operation } from "./Operation.js";
 import { TypeOperations } from "../enums/TypeOperation.js";
+import { rm } from 'fs/promises';
 
 import { directoryLO } from '../classes/ListOperation.js';
 
@@ -223,5 +224,16 @@ export class DirectoryNotes{
       notesFromBrowser.forEach((item) => {
         this.hashNotes.has(item.id)
       })
+    }
+
+    async deleteAllNotes(){
+      if(existsSync(this.folderPath)){
+        try {
+          await rm(this.folderPath, {recursive: true, force: true});
+          return true;    
+        } catch (error) {
+          throw error;
+        }
+      }
     }
 }

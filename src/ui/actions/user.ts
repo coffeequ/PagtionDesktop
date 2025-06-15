@@ -13,3 +13,13 @@ export function GetUser(){
 
     return user;
 }
+
+export function Logout(){
+    
+    //@ts-ignore
+    window.electronAPI.LogoutAfterDeleteNotes();
+
+    localStorage.removeItem("user");
+
+
+}

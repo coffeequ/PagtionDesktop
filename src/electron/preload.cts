@@ -77,6 +77,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
    },
    RefreshNotesAfterLogin: () => {
       return ipcRenderer.invoke("refresh-notes-after-login");
+   },
+   LogoutAfterDeleteNotes: () => {
+      return ipcRenderer.invoke("exit-user");
    }
 });
 
