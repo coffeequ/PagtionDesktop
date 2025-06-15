@@ -6,6 +6,7 @@ import { IUpdateProps } from "../interfaces/IUpdateNote.js";
 import { Operation } from "./Operation.js";
 import { TypeOperations } from "../enums/TypeOperation.js";
 
+import { Directory } from "./Directory.js";
 import { directoryLO } from '../classes/ListOperation.js';
 
 export class DirectoryNotes{
@@ -13,6 +14,8 @@ export class DirectoryNotes{
     private userPath: string = app.getPath("userData");
 
     private folderPath: string = path.join(this.userPath, "Notes");
+
+    directory: Directory = new Directory();
 
     private _notes : Note[] = [];
 
@@ -27,17 +30,6 @@ export class DirectoryNotes{
     public hashNotes = new Map();
 
     private listOP = directoryLO;
-
-    private readFilePromise(filePath: string): Promise<string> {
-        return new Promise((resolve, reject) => {
-          readFile(filePath, "utf-8", (err, data) => {
-            if (err) {
-              return reject(err);
-            }
-            resolve(data);
-          });
-        });
-    }
 
     public GetHashNote(){
       return new Map(this.hashNotes);
@@ -58,67 +50,45 @@ export class DirectoryNotes{
       const files = await promises.readdir(this.folderPath);
       const promiseFiles = files.map(async (item) => {
         const filePath = path.join(this.folderPath, item);
-        const data = await this.readFilePromise(filePath);
+        const data = await this.directory.readFile(filePath);
         return JSON.parse(data);
       });
-      const notes: Note[] = await Promise.all(promiseFiles);
-      this.notes = notes;
-      this.notes.forEach((item) => {
+        const notes: Note[] = await Promise.all(promiseFiles);
+        this.notes = notes;
+        this.notes.forEach((item) => {
         this.hashNotes.set(item.id, item);
       });
     }
       
-    async createNotesDirectory(note: Note): Promise<Note> {
+    async createNotesDirectory(note: Note) {
+      const filePath = `${this.folderPath}/${note.id}.json`;
       return new Promise((resolve, reject) => {
-        const filePath = `${this.folderPath}/${note.id}.json`;
-        writeFile(filePath, JSON.stringify(note), (err) => {
-          if (err) {
-            console.error(err);
-            reject(err);
-          } else {
-            this.notes.push(note);
-            this.listOP.writeOperationFile(new Operation(note, TypeOperations.POST));
-            this.hashNotes.set(note.id, note);
-            resolve(note);
-          }
-        });
-      });
+        try {
+          this.notes.push(note);
+          this.listOP.writeOperationFile(new Operation(note, TypeOperations.POST));
+          this.hashNotes.set(note.id, note);
+          this.directory.writeFileNote(filePath, note);
+          resolve(note)
+        } catch (error) {
+          reject(error);
+        }
+      })
     }
     
       
-    async deleteNoteDirectory(noteId: string): Promise<Note>{
-       return new Promise((resolve, rejects) => {
-        unlink(`${this.folderPath}/${noteId}.json`, (err) => {
-          if(err){
-            rejects(err);
-          }
-          else {
-            const indexDelete = this.notes.findIndex((item) => item.id === noteId);
-            // console.log("indexDelete: ", indexDelete);
-            if(indexDelete === -1){
-              throw new Error(`Ошибка удаления. Заметка не была найдена`);
-            }
-            const [deleteNote] = this.notes.splice(indexDelete, 1); 
-            // console.log("Delete note: ", [deleteNote]);
-            this.listOP.writeOperationFile(new Operation(deleteNote, TypeOperations.DELETE));
-            this.hashNotes.delete(deleteNote.id);
-            resolve(deleteNote);
-          }
-        });
-       })
+    async deleteNoteDirectory(noteId: string) {
+      this.directory.unlinkFile(`${this.folderPath}/${noteId}.json`);
+      const indexDelete = this.notes.findIndex((item) => item.id === noteId);
+      if(indexDelete === -1){
+        throw new Error(`Ошибка удаления. Заметка не была найдена`);
+      }
+        const [deleteNote] = this.notes.splice(indexDelete, 1); 
+        this.listOP.writeOperationFile(new Operation(deleteNote, TypeOperations.DELETE));
+        this.hashNotes.delete(deleteNote.id);
     }
       
-    async editNoteDirectory(note : IUpdateProps): Promise<IUpdateProps> {
-      return new Promise((resolve, rejects) => {
-        writeFile(`${this.folderPath}/${note.id}.json`, JSON.stringify(note), (err) => {
-          if(err){
-            rejects(err);
-          }
-          else {
-            resolve(note);
-          }
-        });
-      })
+    async editNoteDirectory(note : IUpdateProps) {
+      this.directory.writeFileNote(`${this.folderPath}/${note.id}.json`, note);
   }
 
   async restoreNote(noteId: string){

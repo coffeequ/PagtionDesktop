@@ -2,12 +2,15 @@ import path from "path";
 import os from "os"
 import { existsSync, mkdirSync, promises, writeFile } from "fs";
 import { IFilesUpload } from "../interfaces/IFilesUpload.js";
+import { Directory } from "./Directory.js";
 
 export class DirectoryFile{
 
     private filesFolderPath = path.join(os.homedir(), "FilesNotes");
 
     private index: number = 1;
+
+    directory: Directory = new Directory();
 
     filesNameMap = new Map();
 
@@ -51,18 +54,10 @@ export class DirectoryFile{
 
         const buffer = Buffer.from(arrayBuffer);
 
-        return new Promise((resolve, reject) => {
-            writeFile(filePath, buffer, (err) => {
-                if(err){
-                    //console.log(err);
-                    reject(err);
-                }
-                else{
-                    //console.log(`file://${filePath}`);
-                    this.index++;
-                    resolve(`file://${filePath}`);
-                }
-            })
-        })
+        this.directory.writeFileFiles(filePath, buffer);
+
+        this.index++;
+
+        return `file://${filePath}`;
     }
 }
