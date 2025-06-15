@@ -42,5 +42,5 @@ export class DirectorySyncNote{
         return new Response(JSON.stringify({error: "Error connect"}), {status: 404});
       }
   }
-  
+ 
 }

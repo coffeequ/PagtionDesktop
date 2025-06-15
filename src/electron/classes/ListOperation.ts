@@ -6,6 +6,7 @@ import { promisify } from "util";
 import { IOperationQueue } from "../interfaces/IOperationQueue.js";
 import { TypeOperations } from "../enums/TypeOperation.js";
 import { TypeStatusSync } from "../enums/TypeSync.js";
+import { rm } from "fs/promises";
 
 
 export class DirectoryLO{
@@ -175,6 +176,17 @@ export class DirectoryLO{
             clearTimeout(this.timer);
             this.timer = null;
         }
+    }
+
+    async deleteListOperation(){
+      if(existsSync(this.folderPath)){
+        try {
+          await rm(this.folderPath, {recursive: true, force: true});
+          return true;    
+        } catch (error) {
+          throw error;
+        }
+      }
     }
 }
 

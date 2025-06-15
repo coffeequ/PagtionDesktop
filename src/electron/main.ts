@@ -27,12 +27,39 @@ let directoryFile = new DirectoryFile();
 let directoryUserData = new UserData();
 let directorySyncData = new DirectorySyncNote();
 
-async function fetchData(userId: string) {
-  const notes = await directorySyncData.fetchPostNote(userId)
-    if(notes.ok){
-      const notesParse: Note[] = await notes.json();
-      await directorySyncData.WriteFetchNotes(notesParse);
+// async function fetchData(userId: string) {
+//   const notes = await directorySyncData.fetchPostNote(userId)
+//     if(notes.ok){
+//       const notesParse: Note[] = await notes.json();
+//       await directorySyncData.WriteFetchNotes(notesParse);
+//     }
+// }
+
+async function LoadData(userId: string){
+
+  console.log("1");
+  //Чтение файлов
+  directoryFile.createFolder();
+  await directoryFile.readNameFiles();
+
+  console.log("2");
+  //Установка наименование пути для очереди изменений
+  directoryLO.handlSetFilePath(userId);
+
+  console.log("3");
+  //Получение заметок с сервера
+  const res = await directorySyncData.fetchPostNote(userId);
+
+    if(res.ok){
+    
+      const notes: Note[] = await res.json();
+      
+      //Запись полученных заметок
+      await directorySyncData.WriteFetchNotes(notes);
     }
+  console.log("4");
+  //Чтение всех заметок
+  await directoryNotes.readNotesDirectory();
 }
 
 //Главное окно приложения
@@ -101,13 +128,15 @@ if (!gotTheLock) {
 
       if (mainWindow) {
         
-        await fetchData(user.id);
+        LoadData(user.id);
+
+        // await fetchData(user.id);
         
-        await directoryUserData.saveUserFile(user);
+        // await directoryUserData.saveUserFile(user);
 
-        await directoryLO.createListOpearionFile(user.id);
+        // await directoryLO.createListOpearionFile(user.id);
 
-        await directoryNotes.readNotesDirectory();
+        // await directoryNotes.readNotesDirectory();
 
         mainWindow.webContents.send("deep-link", user);
 
@@ -130,13 +159,15 @@ app.on("open-url", async (event, url) => {
   }
   if(mainWindow){
 
-    await fetchData(user.id);
+    LoadData(user.id)
 
-    await directoryUserData.saveUserFile(user);
+    // await fetchData(user.id);
+
+    // await directoryUserData.saveUserFile(user);
     
-    await directoryLO.createListOpearionFile(user.id);
+    // await directoryLO.createListOpearionFile(user.id);
 
-    await directoryNotes.readNotesDirectory();
+    // await directoryNotes.readNotesDirectory();
 
     mainWindow.webContents.send("deep-link", user);
     
@@ -228,12 +259,23 @@ ipcMain.handle("stop-sync", () => {
 ipcMain.handle("save-user-data", async (event, user: UserData) => {
   
   directoryLO.handlSetFilePath(user.id);
-
+  
   await directoryLO.createListOpearionFile(user.id);
 
-  await fetchData(user.id);
+  await LoadData(user.id);
 
-  return directoryUserData.saveUserFile(user);
+  await directoryUserData.saveUserFile(user);
+});
+
+ipcMain.handle("exit-user", async (event) => {
+  await directoryNotes.deleteAllNotes();
+
+  await directoryUserData.deleteUserInfo();
+  
+  await directoryLO.deleteListOperation();
+
+  directoryNotes = new DirectoryNotes();
+
 });
 
 ipcMain.handle("refresh-notes-after-login", async () => {
@@ -242,31 +284,18 @@ ipcMain.handle("refresh-notes-after-login", async () => {
 });
 
 
+
 //Создание окна при загрузки приложения
 app.whenReady().then(async () => {
 
-  //Чтение файлов
-  directoryFile.createFolder();
-  await directoryFile.readNameFiles();
-  
-  //Чтение user id
   const userData = await directoryUserData.readUserFile();
 
-  //Проверка на существование его
-  if(userData !== undefined){
-    directoryLO.handlSetFilePath(userData.id);
-    const res = await directorySyncData.fetchPostNote(userData.id);
-
-    if(res.ok){
-    
-      const notes: Note[] = await res.json();
-    
-      await directorySyncData.WriteFetchNotes(notes);
-    }
+  if(userData){
+    console.log("IfElse work");
+    await LoadData(userData.id);
   }
 
-  //Чтение заметок
-  await directoryNotes.readNotesDirectory();
+  console.log("start window");
 
   //Запуск основого окна
   createMainWindow();
