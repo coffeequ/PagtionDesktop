@@ -17,7 +17,7 @@ export class DirectoryLO{
 
     private userPath: string = app.getPath("userData");
 
-    private folderPath: string = path.join(this.userPath, "ListOperaion");
+    private folderPath: string = path.join(this.userPath, "ListOperation");
 
     filePath: string = " ";
 
@@ -91,18 +91,35 @@ export class DirectoryLO{
         const fileName: string = userId;
 
         this.filePath = `${this.folderPath}/${fileName}.json`;
+
+        console.log("this.filePath", this.filePath);
         
         if(!existsSync(this.folderPath)){
             mkdirSync(this.folderPath, {recursive: true});
         }
-
         try {
             if(!existsSync(this.filePath)){
                 await this.writeFileAsync(this.filePath, JSON.stringify(this.operationQueue));
             }
+            } catch {
+                throw new Error("Error create queue list for this user!");
+            }
+    }
+
+        async CheckIncludeInfo(userId: string){
+
+        const fileName: string = userId;
+
+        this.filePath = `${this.folderPath}/${fileName}.json`;
+
+         try {
+            const data = await this.readFileAsync(this.filePath, "utf-8");
+            const parseData = JSON.parse(data);
+            this.operationQueue = parseData;
         } catch {
-            throw new Error("Error create queue list for this user!");
+            await this.createListOpearionFile(userId);
         }
+
     }
 
     //Метод для записи операции в файл и очередь
@@ -162,8 +179,9 @@ export class DirectoryLO{
         this.timer = setTimeout(async () => await this.sendOperationLoop(), 5000);
     }
 
-    async startSendOperation() {
+    async startSendOperation(userId: string) {
         this.isStatusSend = true;
+        await this.CheckIncludeInfo(userId);
         await this.sendOperationLoop();
     }
 

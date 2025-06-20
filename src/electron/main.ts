@@ -247,7 +247,9 @@ ipcMain.handle("set-send-status", (event, status: boolean) => {
 });
 
 ipcMain.handle("start-sync", async () => {
-  return directoryLO.startSendOperation();
+  const user = await directoryUserData.readUserFile();
+  console.log("user?.id", user?.id);
+  return await directoryLO.startSendOperation(user?.id!);
 });
 
 ipcMain.handle("stop-sync", () => {
