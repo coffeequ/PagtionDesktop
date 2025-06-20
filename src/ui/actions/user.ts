@@ -16,10 +16,6 @@ export function GetUser(){
 
 export function Logout(){
     
-    //@ts-ignore
-    window.electronAPI.LogoutAfterDeleteNotes();
-
     localStorage.removeItem("user");
-
-
+    
 }

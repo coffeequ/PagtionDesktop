@@ -56,13 +56,11 @@ function Editor({ onChange, initialContent, editable } : IEditorProps){
 
     const getSlashMenuItems = useMemo(() => {
         return async (query: string) =>
-          filterSuggestionItems(
+        filterSuggestionItems(
             combineByGroup(
-              getDefaultReactSlashMenuItems(editor),
-              getMultiColumnSlashMenuItems(editor)
-            ),
-            query
-          );
+            getDefaultReactSlashMenuItems(editor),
+            getMultiColumnSlashMenuItems(editor)
+            ),query);
     }, [editor]);
 
 
@@ -72,7 +70,7 @@ function Editor({ onChange, initialContent, editable } : IEditorProps){
     
     return(
         <div>
-            <BlockNoteView editor={editor} theme={ theme === "dark" ? "dark" : "light" } editable = {editable}>
+            <BlockNoteView editor={editor} theme={ theme === "dark" ? "dark" : "light" } editable = {editable} slashMenu={false}>
                 <SuggestionMenuController triggerCharacter={"/"} getItems={getSlashMenuItems} />
             </BlockNoteView>
         </div>

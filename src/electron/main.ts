@@ -36,7 +36,8 @@ async function LoadData(userId: string){
   //Установка наименование пути для очереди изменений
   directoryLO.handlSetFilePath(userId);
 
-  //Получение заметок с сервера
+  
+  //Получение заметок с сервера. Убрать удаление заметок при выходе из аккаунта все таки
   const res = await directorySyncData.fetchPostNote(userId);
 
     if(res.ok){
@@ -48,6 +49,7 @@ async function LoadData(userId: string){
 
   //Чтение всех заметок
   await directoryNotes.readNotesDirectory();
+  console.log(directoryNotes.notes);
 }
 
 //Главное окно приложения
@@ -263,14 +265,15 @@ ipcMain.handle("save-user-data", async (event, user: UserData) => {
   return await directoryUserData.saveUserFile(user);
 });
 
-ipcMain.handle("exit-user", async (event) => {
-  await directoryNotes.deleteAllNotes();
+// ipcMain.handle("exit-user", async (event) => {
 
-  await directoryUserData.deleteUserInfo();
+//   await directoryNotes.deleteAllNotes();
+
+//   await directoryUserData.deleteUserInfo();
   
-  await directoryLO.deleteListOperation();
+//   await directoryLO.deleteListOperation();
 
-});
+// });
 
 ipcMain.handle("refresh-notes-after-login", async () => {
   await directoryNotes.readNotesDirectory();

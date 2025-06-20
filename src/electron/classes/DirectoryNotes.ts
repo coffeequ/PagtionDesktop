@@ -225,6 +225,7 @@ export class DirectoryNotes{
     async deleteAllNotes(){
       if(existsSync(this.folderPath)){
         try {
+          this.notes = [];
           await rm(this.folderPath, {recursive: true, force: true});
           return true;    
         } catch (error) {

@@ -179,7 +179,6 @@ export class DirectoryLO{
       if(existsSync(this.folderPath)){
         try {
           await rm(this.folderPath, {recursive: true, force: true});
-          return true;    
         } catch (error) {
           throw error;
         }

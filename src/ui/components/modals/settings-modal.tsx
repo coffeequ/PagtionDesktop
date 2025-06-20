@@ -98,7 +98,7 @@ export default function SettingsModal(){
                                             setStatusSyncUI(false);
                                             SetStatusSync(false);
                                             //@ts-ignore
-                                            await window.electronAPI.StartSend();
+                                            await window.electronAPI.StopSend();
                                         }
                                     }>
                                         <span className="mr-2">Выключить синхронизацию</span>
@@ -108,9 +108,8 @@ export default function SettingsModal(){
                                 <Button className="flex items-center" onClick={async () => {
                                         setStatusSyncUI(true);
                                         SetStatusSync(true);
-                                        console.log("выкл");
                                         //@ts-ignore
-                                        await window.electronAPI.StopSend();
+                                        await window.electronAPI.StartSend();
                                     }
                                 }>
                                     <span className="mr-2">Включить синхронизацию</span>
