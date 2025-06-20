@@ -2,24 +2,29 @@ import { useEffect, useState } from "react";
 import { Button } from "./button";
 import { Check, FileWarning, Folder } from "lucide-react";
 import Spinner from "./spinner";
-import { GetStatusSync } from "@/actions/statusSync";
 
 
 export default function StatusSync(){
     
-    //@ts-ignore
-    const [isSync, setIsSync] = useState<IStatusSync>("True");
+    const [isSync, setIsSync] = useState<"True" | "False" | "Error">("True");
 
-    const [isSyncStatus, setIsSyncStatus] = useState(GetStatusSync());
+    const [isSyncStatus, setIsSyncStatus] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try{
                 //@ts-ignore
                 const status = await window.electronAPI.GetIsStatusSync();
+                
                 setIsSync(status);
-                setIsSyncStatus(GetStatusSync());
+                
+                //@ts-ignore
+                const sendStatus = await window.electronAPI.GetIsSendStatus();
+                
+                setIsSyncStatus(sendStatus);
+                
                 console.log("status sync:", status);
+                console.log("send status :", sendStatus);
             } catch {
                 console.log("Get status");
             }
@@ -31,10 +36,10 @@ export default function StatusSync(){
 
         return () => clearInterval(interval);
         
-    }, [])
+    }, []);
     
     return(
-        <Button variant="ghost" disabled={ true } >
+        <Button variant="ghost" disabled={ true }>
             {
                 !isSyncStatus ? (
                     <span className="flex flex-row items-center justify-center">

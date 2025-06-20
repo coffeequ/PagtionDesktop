@@ -5,7 +5,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { GetUser } from "@/actions/user";
+import { GetUser, Logout } from "@/actions/user";
 
 export default function UserItem(){
 
@@ -52,9 +52,8 @@ export default function UserItem(){
                 <DropdownMenuSeparator/>
                 <DropdownMenuItem asChild className="w-full cursor-pointer text-muted-foreground">
                     <Button variant="ghost" onClick={() => {
-                        const user = localStorage.getItem("user");
                         if(user){
-                            localStorage.removeItem("user");
+                            Logout();
                             navigate("/login");
                         }
                     }}>

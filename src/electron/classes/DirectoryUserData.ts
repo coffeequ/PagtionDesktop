@@ -3,6 +3,7 @@ import { IUser } from "../interfaces/IUser.js";
 import path from "path";
 import { existsSync, mkdirSync, readFile, writeFile } from "fs";
 import { promisify } from "util";
+import { rm } from "fs/promises";
 
 export class UserData implements IUser{
     id: string = "";
@@ -50,4 +51,15 @@ export class UserData implements IUser{
             return undefined
         }
     }
+
+        async deleteUserInfo(){
+          if(existsSync(this.folderPath)){
+            try {
+              await rm(this.folderPath, {recursive: true, force: true});
+              return true;    
+            } catch (error) {
+              throw error;
+            }
+          }
+        }
 }

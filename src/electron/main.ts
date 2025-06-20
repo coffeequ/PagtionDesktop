@@ -27,12 +27,29 @@ let directoryFile = new DirectoryFile();
 let directoryUserData = new UserData();
 let directorySyncData = new DirectorySyncNote();
 
-async function fetchData(userId: string) {
-  const notes = await directorySyncData.fetchPostNote(userId)
-    if(notes.ok){
-      const notesParse: Note[] = await notes.json();
-      await directorySyncData.WriteFetchNotes(notesParse);
+async function LoadData(userId: string){
+
+  //Чтение файлов
+  directoryFile.createFolder();
+  await directoryFile.readNameFiles();
+
+  //Установка наименование пути для очереди изменений
+  directoryLO.handlSetFilePath(userId);
+
+  
+  //Получение заметок с сервера. Убрать удаление заметок при выходе из аккаунта все таки
+  const res = await directorySyncData.fetchPostNote(userId);
+
+    if(res.ok){
+      const notes: Note[] = await res.json();
+      
+      //Запись полученных заметок
+      await directorySyncData.WriteFetchNotes(notes);
     }
+
+  //Чтение всех заметок
+  await directoryNotes.readNotesDirectory();
+  console.log(directoryNotes.notes);
 }
 
 //Главное окно приложения
@@ -101,13 +118,15 @@ if (!gotTheLock) {
 
       if (mainWindow) {
         
-        await fetchData(user.id);
+        await LoadData(user.id);
+
+        // await fetchData(user.id);
         
         await directoryUserData.saveUserFile(user);
 
         await directoryLO.createListOpearionFile(user.id);
 
-        await directoryNotes.readNotesDirectory();
+        // await directoryNotes.readNotesDirectory();
 
         mainWindow.webContents.send("deep-link", user);
 
@@ -130,13 +149,15 @@ app.on("open-url", async (event, url) => {
   }
   if(mainWindow){
 
-    await fetchData(user.id);
+    await LoadData(user.id)
+
+    // await fetchData(user.id);
 
     await directoryUserData.saveUserFile(user);
     
     await directoryLO.createListOpearionFile(user.id);
 
-    await directoryNotes.readNotesDirectory();
+    // await directoryNotes.readNotesDirectory();
 
     mainWindow.webContents.send("deep-link", user);
     
@@ -217,8 +238,18 @@ ipcMain.handle("get-current-status-sync", () => {
   return directoryLO.handleGetSyncStatus();
 });
 
+ipcMain.handle("get-current-send-status", () => {
+  return directoryLO.handleGetSendStatus();
+});
+
+ipcMain.handle("set-send-status", (event, status: boolean) => {
+  return directoryLO.handleSetSendStatus(status);
+});
+
 ipcMain.handle("start-sync", async () => {
-  return directoryLO.startSendOperation();
+  const user = await directoryUserData.readUserFile();
+  console.log("user?.id", user?.id);
+  return await directoryLO.startSendOperation(user?.id!);
 });
 
 ipcMain.handle("stop-sync", () => {
@@ -228,13 +259,23 @@ ipcMain.handle("stop-sync", () => {
 ipcMain.handle("save-user-data", async (event, user: UserData) => {
   
   directoryLO.handlSetFilePath(user.id);
-
+  
   await directoryLO.createListOpearionFile(user.id);
 
-  await fetchData(user.id);
+  await LoadData(user.id);
 
-  return directoryUserData.saveUserFile(user);
+  return await directoryUserData.saveUserFile(user);
 });
+
+// ipcMain.handle("exit-user", async (event) => {
+
+//   await directoryNotes.deleteAllNotes();
+
+//   await directoryUserData.deleteUserInfo();
+  
+//   await directoryLO.deleteListOperation();
+
+// });
 
 ipcMain.handle("refresh-notes-after-login", async () => {
   await directoryNotes.readNotesDirectory();
@@ -242,31 +283,15 @@ ipcMain.handle("refresh-notes-after-login", async () => {
 });
 
 
+
 //Создание окна при загрузки приложения
 app.whenReady().then(async () => {
 
-  //Чтение файлов
-  directoryFile.createFolder();
-  await directoryFile.readNameFiles();
-  
-  //Чтение user id
   const userData = await directoryUserData.readUserFile();
 
-  //Проверка на существование его
-  if(userData !== undefined){
-    directoryLO.handlSetFilePath(userData.id);
-    const res = await directorySyncData.fetchPostNote(userData.id);
-
-    if(res.ok){
-    
-      const notes: Note[] = await res.json();
-    
-      await directorySyncData.WriteFetchNotes(notes);
-    }
+  if(userData){
+    await LoadData(userData.id);
   }
-
-  //Чтение заметок
-  await directoryNotes.readNotesDirectory();
 
   //Запуск основого окна
   createMainWindow();
