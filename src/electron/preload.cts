@@ -72,12 +72,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
    GetIsStatusSync: () => {
       return ipcRenderer.invoke("get-current-status-sync");
    },
+   SetIsStatusSync: (status: boolean) => {
+      return ipcRenderer.invoke("set-send-status", status);
+   },
+   GetIsSendStatus: () => {
+      return ipcRenderer.invoke("get-current-send-status");
+   },
    SaveUserData: (user: any) => {
       return ipcRenderer.invoke("save-user-data", user);
    },
    RefreshNotesAfterLogin: () => {
       return ipcRenderer.invoke("refresh-notes-after-login");
-   }
+   },
+   // LogoutAfterDeleteNotes: () => {
+   //    return ipcRenderer.invoke("exit-user");
+   // }
 });
 
 

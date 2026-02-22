@@ -5,6 +5,7 @@ import { Note } from "./Note.js";
 import { IUpdateProps } from "../interfaces/IUpdateNote.js";
 import { Operation } from "./Operation.js";
 import { TypeOperations } from "../enums/TypeOperation.js";
+import { rm } from 'fs/promises';
 
 import { Directory } from "./Directory.js";
 import { directoryLO } from '../classes/ListOperation.js';
@@ -169,13 +170,11 @@ export class DirectoryNotes{
 
     async trashNote(userId: string){
       const trash: Note[] = [];
-      // console.log("notes: ", this.notes);
       this.notes.forEach((item) => {
         if(item.isArchived === true && item.userId === userId){
           trash.push(item);
         }
       })
-      // console.log("trash: ", trash);
       return trash;
     }
 
@@ -193,5 +192,17 @@ export class DirectoryNotes{
       notesFromBrowser.forEach((item) => {
         this.hashNotes.has(item.id)
       })
+    }
+
+    async deleteAllNotes(){
+      if(existsSync(this.folderPath)){
+        try {
+          this.notes = [];
+          await rm(this.folderPath, {recursive: true, force: true});
+          return true;    
+        } catch (error) {
+          throw error;
+        }
+      }
     }
 }

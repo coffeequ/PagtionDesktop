@@ -6,8 +6,7 @@ import NoteInput from "@/components/ui/note-input"
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Folder, FolderSync } from "lucide-react";
-import { cn } from "@/lib/utils"
-import { GetStatusSync, SetStatusSync } from "@/actions/statusSync";
+import { SetStatusSync } from "@/actions/statusSync";
 
 export default function SettingsModal(){
 
@@ -17,7 +16,7 @@ export default function SettingsModal(){
 
     const [filePath, setFilePath] = useState("");
 
-    const [statusSyncUI, setStatusSyncUI] = useState<boolean>(GetStatusSync());
+    const [statusSyncUI, setStatusSyncUI] = useState<boolean>(false);
 
     useEffect(() => {
         //@ts-ignore
@@ -30,26 +29,16 @@ export default function SettingsModal(){
             setFilePath(item);
         });
 
-        onHandleSyncData()
-
     }, [])
 
-
-    const onHandleSyncData = async () => {
-        //Включение
-        if(statusSyncUI){
-            SetStatusSync(true);
+    useEffect(() => {
+        const fetchStatusSend = async () => {
             //@ts-ignore
-            window.electronAPI.StartSend();
+            const status = await window.electronAPI.GetIsSendStatus();
+            setStatusSyncUI(status);
         }
-        else{
-            SetStatusSync(false);
-            //@ts-ignore
-            window.electronAPI.StopSend();
-        }
-        //Выключение
-        setStatusSyncUI((prev) => !prev);
-    } 
+        fetchStatusSend();
+    }, [])
 
     return (
         <Dialog open = {settings.isOpen} onOpenChange={settings.onClose}>
@@ -101,22 +90,34 @@ export default function SettingsModal(){
                             Между устройствами. Функция находится в бета-тестировании*
                         </span>
                     </div>
-                    <Button onClick={onHandleSyncData} className={cn(statusSyncUI ? "bg-secondary-foreground" : "")}>
+                    <div>
                         {
                             statusSyncUI ? 
                             (
-                                <div className="flex items-center">
-                                    <span className="mr-2">Включить синхронизацию</span>
-                                    <FolderSync/>
-                                </div>
+                                 <Button className="flex items-center" onClick={async () => {
+                                            setStatusSyncUI(false);
+                                            SetStatusSync(false);
+                                            //@ts-ignore
+                                            await window.electronAPI.StopSend();
+                                        }
+                                    }>
+                                        <span className="mr-2">Выключить синхронизацию</span>
+                                        <FolderSync/>
+                                </Button>   
                             ) : (
-                                <div className="flex items-center">
-                                    <span className="mr-2">Выключить синхронизацию</span>
+                                <Button className="flex items-center" onClick={async () => {
+                                        setStatusSyncUI(true);
+                                        SetStatusSync(true);
+                                        //@ts-ignore
+                                        await window.electronAPI.StartSend();
+                                    }
+                                }>
+                                    <span className="mr-2">Включить синхронизацию</span>
                                     <Folder/>
-                                </div>
+                                </Button>
                             )
                         }
-                    </Button>
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>

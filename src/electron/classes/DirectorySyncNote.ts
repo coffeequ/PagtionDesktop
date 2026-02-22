@@ -18,6 +18,9 @@ export class DirectorySyncNote{
   }
     
   public async WriteFetchNotes(notes: Note[]){
+    if(!existsSync(this.folderPath)){
+      mkdirSync(this.folderPath, { recursive: true });
+    }
     const promiseWrite = notes.map((item) => {
       const filePath = `${this.folderPath}/${item.id}.json`;
           this.directory.writeFileNote(filePath, item);
@@ -28,7 +31,7 @@ export class DirectorySyncNote{
 
   public async fetchPostNote(id: string): Promise<Response>{
     try {
-        const res = await net.fetch("https://pagtion.vercel.app//api/getNote", {
+        const res = await net.fetch("https://pagtion.vercel.app/api/getNote", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -41,5 +44,5 @@ export class DirectorySyncNote{
         return new Response(JSON.stringify({error: "Error connect"}), {status: 404});
       }
   }
-  
+ 
 }

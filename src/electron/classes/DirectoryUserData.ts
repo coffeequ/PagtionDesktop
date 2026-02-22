@@ -44,4 +44,15 @@ export class UserData implements IUser{
             return undefined
         }
     }
+
+        async deleteUserInfo(){
+          if(existsSync(this.folderPath)){
+            try {
+              await rm(this.folderPath, {recursive: true, force: true});
+              return true;    
+            } catch (error) {
+              throw error;
+            }
+          }
+        }
 }
