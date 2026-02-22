@@ -36,8 +36,6 @@ export default function Navbar({ isCollapsed, onResetWidth } : NavbarProps) {
                 throw new Error("Не найден id пользователя!");
             }
 
-            // console.log("navbar useParams id: ", id);
-
             //@ts-ignore
             const data = await window.electronAPI.idNote(id as string, user.id);
             setDocuments(data); 

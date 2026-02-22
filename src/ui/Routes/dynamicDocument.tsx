@@ -31,7 +31,7 @@ export default function DocumentIdPage(){
             //@ts-ignore
             await window.electronAPI.idNote(id).then((item) => {
                 setDocument(item);
-                if(item.coverImage){
+                if(item.coverImage !== undefined){
                     setCoverImage(item.coverImage);
                 }
                 else{

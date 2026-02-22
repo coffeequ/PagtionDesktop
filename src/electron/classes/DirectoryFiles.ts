@@ -2,12 +2,15 @@ import path from "path";
 import os from "os"
 import { existsSync, mkdirSync, promises, writeFile } from "fs";
 import { IFilesUpload } from "../interfaces/IFilesUpload.js";
+import { Directory } from "./Directory.js";
 
 export class DirectoryFile{
 
     private filesFolderPath = path.join(os.homedir(), "FilesNotes");
 
     private index: number = 1;
+
+    directory: Directory = new Directory();
 
     filesNameMap = new Map();
 
@@ -16,7 +19,6 @@ export class DirectoryFile{
     }
     
     createFolder(): void {
-        //console.log(this.filesFolderPath);
         if(!existsSync(this.filesFolderPath)){
             mkdirSync(this.filesFolderPath, { recursive: true });
         }
@@ -27,14 +29,11 @@ export class DirectoryFile{
         files.forEach((item) => {
             this.filesNameMap.set(item, "");
         });
-        //console.log(this.filesNameMap);
         return;
     }
 
     async handleUpload({ name, arrayBuffer }: IFilesUpload): Promise<string>{
         
-        //console.log("File: ", name);
-
         if(this.filesNameMap.has(name)){
             let [editText, format] = name.split(".");
             editText += ` (${this.index})`;
@@ -43,26 +42,14 @@ export class DirectoryFile{
 
         const fileName = name;
 
-        //console.log("fileName: ", fileName);
-
         const filePath = path.join(this.filesFolderPath, fileName);
-
-        //console.log("filePath: ", filePath);
 
         const buffer = Buffer.from(arrayBuffer);
 
-        return new Promise((resolve, reject) => {
-            writeFile(filePath, buffer, (err) => {
-                if(err){
-                    //console.log(err);
-                    reject(err);
-                }
-                else{
-                    //console.log(`file://${filePath}`);
-                    this.index++;
-                    resolve(`file://${filePath}`);
-                }
-            })
-        })
+        this.directory.writeFileFiles(filePath, buffer);
+
+        this.index++;
+
+        return `file://${filePath}`;
     }
 }

@@ -59,9 +59,8 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
     }
 
     function onIconSelect(icon: string){
-        // console.log("icon: ", icon);
         //@ts-ignore
-        window.electronAPI.updateNote({ noteId: initialData.noteId, icon }).then(() => {
+        window.electronAPI.updateNote({ id: initialData.id, icon }).then(() => {
             setIcon(icon);
             triggerRefresh();
         });
@@ -69,7 +68,7 @@ export default function Toolbar({ initialData, preview, onTitleChange } : IToolb
 
     function onIconRemove(){
         //@ts-ignore
-        window.electronAPI.updateNote({ noteId: initialData.noteId, icon: "" }).then((item: INote) => {
+        window.electronAPI.updateNote({ id: initialData.id, icon: "" }).then((item: INote) => {
             setIcon(undefined);
             triggerRefresh();
         });

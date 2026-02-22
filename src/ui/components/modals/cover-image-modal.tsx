@@ -41,7 +41,7 @@ export default function CoverImageModal(){
             const res = await window.electronAPI.handleUploadFile({name, arrayBuffer});
 
             //@ts-ignore
-            await window.electronAPI.updateNote({ noteId: params, coverImage: res})
+            await window.electronAPI.updateNote({ id: params, coverImage: res})
 
             coverImage.setCoverImage(res);
             setTimeout(() => coverImage.setCoverImage(res), 100);

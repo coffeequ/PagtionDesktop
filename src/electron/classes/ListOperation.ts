@@ -1,12 +1,12 @@
 import { app, net } from "electron";
-import { existsSync, mkdirSync, promises, readFile, writeFile } from "fs";
+import { existsSync, mkdirSync, readFile, writeFile } from "fs";
 import path from "path";
 import { Operation } from "./Operation.js";
 import { promisify } from "util";
 import { IOperationQueue } from "../interfaces/IOperationQueue.js";
 import { TypeOperations } from "../enums/TypeOperation.js";
-import { UserData } from "./DirectoryUserData.js";
 import { TypeStatusSync } from "../enums/TypeSync.js";
+import { Directory } from "./Directory.js";
 
 
 export class DirectoryLO{
@@ -17,9 +17,9 @@ export class DirectoryLO{
 
     private userPath: string = app.getPath("userData");
 
-    private folderPath: string = path.join(this.userPath, "ListOperaion");
+    private folderPath: string = path.join(this.userPath, "ListOperation");
 
-    private filePath: string = " ";
+    filePath: string = " ";
 
     private timer: NodeJS.Timeout | null = null;
 
@@ -35,9 +35,7 @@ export class DirectoryLO{
         [TypeOperations.DELETE]: []
     };
 
-    private readFileAsync = promisify(readFile);
-
-    private writeFileAsync = promisify(writeFile);
+    directory: Directory = new Directory();
 
     private handleFetchData = async (operation: Operation) => {
        try {
@@ -53,6 +51,15 @@ export class DirectoryLO{
         const res = new Response(JSON.stringify({error: "Not connect"}), {status: 404});
         return res.ok;
        }
+    }
+
+
+    handleGetSendStatus = () => {
+        return this.isStatusSend;
+    }
+
+    handleSetSendStatus = (state: boolean) => {
+        return this.isStatusSend = state;
     }
 
     handleGetSyncStatus = () => {
@@ -81,31 +88,44 @@ export class DirectoryLO{
 
         const fileName: string = userId;
 
-        // console.log("fileName: ", fileName);
-
         this.filePath = `${this.folderPath}/${fileName}.json`;
+
+        console.log("this.filePath", this.filePath);
         
-        // console.log("Method work and create list for queue!");
         if(!existsSync(this.folderPath)){
             mkdirSync(this.folderPath, {recursive: true});
         }
-
         try {
             if(!existsSync(this.filePath)){
-                await this.writeFileAsync(this.filePath, JSON.stringify(this.operationQueue));
+                await this.directory.writeFileObj(this.filePath, JSON.stringify(this.operationQueue));
             }
+            } catch {
+                throw new Error("Error create queue list for this user!");
+            }
+    }
+
+        async CheckIncludeInfo(userId: string){
+
+        const fileName: string = userId;
+
+        this.filePath = `${this.folderPath}/${fileName}.json`;
+
+         try {
+            const data = await this.readFileAsync(this.filePath, "utf-8");
+            const parseData = JSON.parse(data);
+            this.operationQueue = parseData;
         } catch {
-            throw new Error("Error create queue list for this user!");
+            await this.createListOpearionFile(userId);
         }
+
     }
 
     //Метод для записи операции в файл и очередь
     async writeOperationFile(operation: Operation){
-        // console.log("this.filePath write-opration: ", this.filePath);
         try {
             await this.readOpeartionFile();
         } catch (e) {
-            console.warn("Could not read operation file before writing, using current queue.", e);
+            throw new Error("Read operations file!");
         }
 
         this.operationQueue[operation.typeOperation].push(operation);
@@ -113,7 +133,7 @@ export class DirectoryLO{
         const body = JSON.stringify(this.operationQueue);
 
         try {
-            await this.writeFileAsync(this.filePath, body);
+            await this.directory.writeFileObj(this.filePath, body);
         } catch {
             throw new Error("Error write note!");
         }
@@ -121,10 +141,10 @@ export class DirectoryLO{
 
     //Метод для чтения очереди операций
     async readOpeartionFile(){
-        // console.log("this.filePath read-opration: ", this.filePath);
         try {
-            const data = await this.readFileAsync(this.filePath, "utf-8");
-            const parseData = JSON.parse(data);
+            const data = await this.directory.readFile(this.filePath);
+            console.log(data);
+            const parseData: IOperationQueue = JSON.parse(data);
             this.operationQueue = parseData;
         } catch {
             throw new Error("Read file async");
@@ -132,28 +152,24 @@ export class DirectoryLO{
     }
 
     //Метод для отправки операций
+    //Попрбовать исправить как-нибудь case при котором заметки нет на сервере, но она есть на клиенте
     private async sendOperationLoop(){
         if(this.isStatusSend){
             await this.readOpeartionFile();
             for(const typeOp of [TypeOperations.POST, TypeOperations.PUT, TypeOperations.DELETE]){
-                // console.log("send typeOp: ", typeOp);
-                // console.log("length: ", this.operationQueue[typeOp]);
                 while(this.operationQueue[typeOp].length){
                     this.handleSetSyncStatusFalse();
-                    // console.log("length-before: ", this.operationQueue[typeOp]);
                     const op = this.operationQueue[typeOp].shift();
-                    // console.log("op-:", op);
                     if(op){
                         const res = await this.handleFetchData(op);
                         if(!res){
-                            // console.log("res-unshift: ", res);
                             this.operationQueue[typeOp].unshift(op);
                             this.handleSetSyncStatusError();
                             return;
                         }
                         this.handleSetSyncStatusTrue();
                         const body = JSON.stringify(this.operationQueue);
-                        await this.writeFileAsync(this.filePath, body, { encoding: "utf-8" });
+                        await this.directory.writeFileObj(this.filePath, body);
                     }
                 }
             }
@@ -162,19 +178,28 @@ export class DirectoryLO{
         this.timer = setTimeout(async () => await this.sendOperationLoop(), 5000);
     }
 
-    async startSendOperation() {
+    async startSendOperation(userId: string) {
         this.isStatusSend = true;
-        // console.log("start send operation");
+        await this.CheckIncludeInfo(userId);
         await this.sendOperationLoop();
     }
 
     stopSendOperation() {
         this.isStatusSend = false;
-        // console.log("end send operation");
         if(this.timer){
             clearTimeout(this.timer);
             this.timer = null;
         }
+    }
+
+    async deleteListOperation(){
+      if(existsSync(this.folderPath)){
+        try {
+          await rm(this.folderPath, {recursive: true, force: true});
+        } catch (error) {
+          throw error;
+        }
+      }
     }
 }
 

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain, nativeTheme, net } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, nativeTheme } from 'electron';
 import path from 'path';
 
 //Интерфейсы
@@ -18,10 +18,6 @@ import { directoryLO } from './classes/ListOperation.js';
 
 type Theme = "dark" | "light";
 
-//TODO: 
-// 1) Сделать проверку подключения к серверу используя его api. Уточнее: сделать эндпоинт для получения состояния.
-
-
 //Remind: В продакшене использовать две .., в дев .
 let mainWindow: BrowserWindow;
 
@@ -31,11 +27,29 @@ let directoryFile = new DirectoryFile();
 let directoryUserData = new UserData();
 let directorySyncData = new DirectorySyncNote();
 
-async function fetchData(userId: string) {
-  const notes = await directorySyncData.fetchPostNote(userId)
-    if(notes.ok){
-      directorySyncData.ExistsNoteLocale(await notes.json());
+async function LoadData(userId: string){
+
+  //Чтение файлов
+  directoryFile.createFolder();
+  await directoryFile.readNameFiles();
+
+  //Установка наименование пути для очереди изменений
+  directoryLO.handlSetFilePath(userId);
+
+  
+  //Получение заметок с сервера. Убрать удаление заметок при выходе из аккаунта все таки
+  const res = await directorySyncData.fetchPostNote(userId);
+
+    if(res.ok){
+      const notes: Note[] = await res.json();
+      
+      //Запись полученных заметок
+      await directorySyncData.WriteFetchNotes(notes);
     }
+
+  //Чтение всех заметок
+  await directoryNotes.readNotesDirectory();
+  console.log(directoryNotes.notes);
 }
 
 //Главное окно приложения
@@ -54,39 +68,6 @@ function createMainWindow(){
 
   mainWindow.menuBarVisible = false;
 }
-
-//Создание окна при загрузки приложения
-app.whenReady().then(async () => {
-
-  //Чтение файлов
-  directoryFile.createFolder();
-  directoryFile.readNameFiles();
-  
-  //TODO: Данные почему-то не подтягиваются автоматически
-  //Получение айди пользователя для фетчинга данных с сервера
-  const userData = await directoryUserData.readUserFile();
-
-  console.log(userData);
-
-  if(userData !== undefined){
-    const res = await directorySyncData.fetchPostNote(userData.id);
-
-    if(res.ok){
-    
-      const notes: Note[] = await res.json();
-    
-      // console.log("get notes: ", notes);
-    
-      await directorySyncData.ExistsNoteLocale(notes);
-    }
-  }
-
-  //Чтение заметок
-  directoryNotes.readNotesDirectory();
-  
-  //Запуск основого окна
-  createMainWindow();
-});
 
 //Создание кастомного протокола на macOS
 app.setAsDefaultProtocolClient("pagtion");
@@ -122,14 +103,11 @@ const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
 } else {
-  app.on('second-instance', (event, argv, workingDirectory) => {
+  app.on('second-instance', async (event, argv, workingDirectory) => {
     const deepLink = argv.find(arg => arg.startsWith('pagtion://'));
     if (deepLink) {
-      //console.log("Получен deep link (в second-instance):", deepLink);
 
       const parsedUrl = new URL(deepLink);
-
-      //console.log(parsedUrl);
 
       const user: IUser = {
         id: parsedUrl.searchParams.get("id")!,
@@ -138,28 +116,30 @@ if (!gotTheLock) {
         image: parsedUrl.searchParams.get("image")!,
       }
 
-      
       if (mainWindow) {
+        
+        await LoadData(user.id);
+
+        // await fetchData(user.id);
+        
+        await directoryUserData.saveUserFile(user);
+
+        await directoryLO.createListOpearionFile(user.id);
+
+        // await directoryNotes.readNotesDirectory();
 
         mainWindow.webContents.send("deep-link", user);
-        
+
         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
         
-        mainWindow.isFocused();
-        
-        fetchData(user.id);
-        
-        directoryUserData.saveUserFile(user);
-
-        directoryLO.createListOpearionFile(user.id);
+        mainWindow.focus();
       }
     }
   });
 }
 //Получение глубокой ссылки с macOS
-app.on("open-url", (event, url) => {
+app.on("open-url", async (event, url) => {
   event.preventDefault();
-  //console.log("Получен deep link:", url);
   const parsedUrl = new URL(url);
   const user: IUser = {
     id: parsedUrl.searchParams.get("id")!,
@@ -168,17 +148,22 @@ app.on("open-url", (event, url) => {
     image: parsedUrl.searchParams.get("image")!,
   }
   if(mainWindow){
+
+    await LoadData(user.id)
+
+    // await fetchData(user.id);
+
+    await directoryUserData.saveUserFile(user);
+    
+    await directoryLO.createListOpearionFile(user.id);
+
+    // await directoryNotes.readNotesDirectory();
+
     mainWindow.webContents.send("deep-link", user);
     
     mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
     
-    mainWindow.isFocused();
-
-    fetchData(user.id);
-
-    directoryUserData.saveUserFile(user);
-    
-    directoryLO.createListOpearionFile(user.id);
+    mainWindow.focus();
   }  
 });
 
@@ -188,7 +173,7 @@ ipcMain.handle("read-notes", async () => {
 });
 
 
-ipcMain.handle("create-notes", async (event, title: string, userId: string, parentDocumentId?: string) => {
+ipcMain.handle("create-notes", async (event, title: string, userId: string, parentDocumentId: string | null) => {
   const note = new Note(title, userId, parentDocumentId);
   const newNote = directoryNotes.createNotesDirectory(note);
   return newNote;
@@ -214,7 +199,7 @@ ipcMain.handle("restore-notes", async (event, noteId: string) => {
 });
 
 ipcMain.handle("sidebar-notes", async (event, userId: string, parentDocumentId: string) => {
-  return directoryNotes.sidebar(userId, parentDocumentId);
+  return await directoryNotes.sidebar(userId, parentDocumentId);
 });
 
 ipcMain.handle("archived-notes", async (event, noteId: string) => {
@@ -253,8 +238,18 @@ ipcMain.handle("get-current-status-sync", () => {
   return directoryLO.handleGetSyncStatus();
 });
 
+ipcMain.handle("get-current-send-status", () => {
+  return directoryLO.handleGetSendStatus();
+});
+
+ipcMain.handle("set-send-status", (event, status: boolean) => {
+  return directoryLO.handleSetSendStatus(status);
+});
+
 ipcMain.handle("start-sync", async () => {
-  return directoryLO.startSendOperation();
+  const user = await directoryUserData.readUserFile();
+  console.log("user?.id", user?.id);
+  return await directoryLO.startSendOperation(user?.id!);
 });
 
 ipcMain.handle("stop-sync", () => {
@@ -263,7 +258,43 @@ ipcMain.handle("stop-sync", () => {
 
 ipcMain.handle("save-user-data", async (event, user: UserData) => {
   
+  directoryLO.handlSetFilePath(user.id);
+  
   await directoryLO.createListOpearionFile(user.id);
 
-  return directoryUserData.saveUserFile(user);
-})
+  await LoadData(user.id);
+
+  return await directoryUserData.saveUserFile(user);
+});
+
+// ipcMain.handle("exit-user", async (event) => {
+
+//   await directoryNotes.deleteAllNotes();
+
+//   await directoryUserData.deleteUserInfo();
+  
+//   await directoryLO.deleteListOperation();
+
+// });
+
+ipcMain.handle("refresh-notes-after-login", async () => {
+  await directoryNotes.readNotesDirectory();
+  return true;
+});
+
+
+
+//Создание окна при загрузки приложения
+app.whenReady().then(async () => {
+
+  const userData = await directoryUserData.readUserFile();
+
+  if(userData){
+    await LoadData(userData.id);
+  }
+
+  //Запуск основого окна
+  createMainWindow();
+
+  mainWindow.focus();
+});

@@ -169,7 +169,7 @@ export default function Navigation(){
                 </div>
                 <hr className="mt-2"/>
                 <div className="flex-1 overflow-y-auto mt-4">
-                   <DocumentList collapse={collapse} isMobile={isMobile} />
+                    <DocumentList collapse={collapse} isMobile={isMobile} />
                    <div className="mt-4 mb-4">
                         <Item onClick={handleCreateNote} label="Добавить страницу" icon={Plus}/>
                    </div>

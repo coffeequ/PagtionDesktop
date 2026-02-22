@@ -2,6 +2,7 @@ import { app, net } from "electron";
 import path from "path";
 import { Note } from "./Note.js";
 import { writeFile } from "fs";
+import { Directory } from "./Directory.js";
 
 
 export class DirectorySyncNote{
@@ -10,21 +11,19 @@ export class DirectorySyncNote{
 
   private folderPath: string = path.join(this.userPath, "Notes");
 
-  private statusWeb: boolean = false;
+  directory: Directory = new Directory();
 
   GetFolderNotePath(): string {
     return this.folderPath;
   }
     
-  public async ExistsNoteLocale(notes: Note[]){
-    // console.log("Метод сработал. Все полученные заметки:", notes);
+  public async WriteFetchNotes(notes: Note[]){
+    if(!existsSync(this.folderPath)){
+      mkdirSync(this.folderPath, { recursive: true });
+    }
     const promiseWrite = notes.map((item) => {
       const filePath = `${this.folderPath}/${item.id}.json`;
-          writeFile(filePath, JSON.stringify(item), (err) => {
-          if (err) {
-            console.error(err);
-          }
-        });
+          this.directory.writeFileNote(filePath, item);
     });
 
     await Promise.all(promiseWrite);
@@ -45,5 +44,5 @@ export class DirectorySyncNote{
         return new Response(JSON.stringify({error: "Error connect"}), {status: 404});
       }
   }
-  
+ 
 }

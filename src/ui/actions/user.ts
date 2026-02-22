@@ -13,3 +13,9 @@ export function GetUser(){
 
     return user;
 }
+
+export function Logout(){
+    
+    localStorage.removeItem("user");
+    
+}

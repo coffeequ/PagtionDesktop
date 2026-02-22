@@ -8,7 +8,6 @@ import {
     Popover,
     PopoverContent
 } from "@/components/ui/popover"
-import useOrigin from "@/hooks/use-origin";
 import { Button } from "@/components/ui/button";
 import { INote } from "@/interfaces/INote";
 
@@ -18,25 +17,23 @@ interface IPublishProps {
     refresh: () => void;
 }
 
-export default function Publish({ initialData } : IPublishProps) {
-
-    const origin = useOrigin();
+export default function Publish({ initialData, refresh } : IPublishProps) {
 
     const [copied, setCopied] = useState(false);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const url = `${origin}/preview/${initialData.id}`;
+    const url = `https://pagtion.vercel.app/preview/${initialData.id}`;
 
     function onPublished() {
 
         setIsSubmitting(true);
         
         //@ts-ignore
-        // const promise = window.electronAPI.updateNote({noteId: initialData.id, isPublished: true}).finally(() => {
-        //     setIsSubmitting(false);
-        //     refresh();
-        // });
+        const promise = window.electronAPI.updateNote({id: initialData.id, isPublished: true}).finally(() => {
+            setIsSubmitting(false);
+            refresh();
+        });
 
         toast.promise(promise, {
             loading: "Публикация...",
@@ -49,10 +46,10 @@ export default function Publish({ initialData } : IPublishProps) {
         setIsSubmitting(true);
         
         //@ts-ignore
-        // const promise = window.electronAPI.updateNote({noteId: initialData.id, isPublished: false}).finally(() => {
-        //     setIsSubmitting(false);
-        //     refresh();
-        // });
+        const promise = window.electronAPI.updateNote({id: initialData.id, isPublished: false}).finally(() => {
+            setIsSubmitting(false);
+            refresh();
+        });
         
         toast.promise(promise, {
             loading: "Отмена публикации...",

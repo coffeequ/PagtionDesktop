@@ -2,16 +2,13 @@ import { Outlet } from "react-router-dom";
 import Navigation from "@/components/ui/navigation";
 import SearchCommand from "@/components/ui/search-command";
 import { useEffect } from "react";
+import { GetStatusSync } from "@/actions/statusSync";
 
 export default function DocumentPage(){
 
     useEffect(() => {
-        console.log("Фетч запрос для получения заметок клиента получен");
-        const loadData = async () => {
-            //@ts-ignore
-            await window.electronAPI.LoadUserNote();
-        }
-        loadData();
+        //@ts-ignore
+        window.electronAPI.SetIsStatusSync(GetStatusSync())
     }, [])
 
     return(

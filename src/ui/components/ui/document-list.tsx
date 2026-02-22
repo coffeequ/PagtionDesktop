@@ -13,7 +13,7 @@ interface DocumentListProps{
     parentDocumentId?: string;
     level?: number;
     collapse: () => void;
-    isMobile: boolean
+    isMobile: boolean,
 }
 
 export default function DocumentList({ parentDocumentId, level = 0, collapse, isMobile } : DocumentListProps) {
@@ -26,7 +26,7 @@ export default function DocumentList({ parentDocumentId, level = 0, collapse, is
 
     const user = GetUser();
 
-    const [documents, setDocuments] = useState<INote[]>([]);
+    const [documents, setDocuments] = useState<INote[] | undefined>(undefined);
 
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
@@ -48,7 +48,7 @@ export default function DocumentList({ parentDocumentId, level = 0, collapse, is
 
     useEffect(() => {
         fetchDocuments();
-    }, [parentDocumentId, shouldRefresh]);
+    }, [parentDocumentId, shouldRefresh, user.id]);
 
     function refreshDocuments(){
         fetchDocuments();
