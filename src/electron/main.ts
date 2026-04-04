@@ -25,7 +25,7 @@ let directoryNotes = new DirectoryNotes();
 let directoryFile = new DirectoryFile();
 
 let directoryUserData = new UserData();
-let directorySyncData = new DirectorySyncNote();
+//let directorySyncData = new DirectorySyncNote();
 
 async function LoadData(userId: string){
 
@@ -37,15 +37,16 @@ async function LoadData(userId: string){
   directoryLO.handlSetFilePath(userId);
 
   
+  //СЕРВЕР ОТКЛЮЧЕН
   //Получение заметок с сервера. Убрать удаление заметок при выходе из аккаунта все таки
-  const res = await directorySyncData.fetchPostNote(userId);
+  // const res = await directorySyncData.fetchPostNote(userId);
 
-    if(res.ok){
-      const notes: Note[] = await res.json();
+  //   if(res.ok){
+  //     const notes: Note[] = await res.json();
       
-      //Запись полученных заметок
-      await directorySyncData.WriteFetchNotes(notes);
-    }
+  //     //Запись полученных заметок
+  //     await directorySyncData.WriteFetchNotes(notes);
+  //   }
 
   //Чтение всех заметок
   await directoryNotes.readNotesDirectory();
@@ -85,13 +86,13 @@ ipcMain.handle("openAuth", (event, provider: string) => {
   shell.openExternal(`https://pagtion.vercel.app/electronRedirectOauth?selectProviders=${provider}`);
 })
 
-ipcMain.handle("openRegister", () => {
-  shell.openExternal(`https://pagtion.vercel.app/register`);
-})
+// ipcMain.handle("openRegister", () => {
+//   shell.openExternal(`https://pagtion.vercel.app/register`);
+// })
 
-ipcMain.handle("openResetPassword", () => {
-  shell.openExternal(`https://pagtion.vercel.app/reset`);
-})
+// ipcMain.handle("openResetPassword", () => {
+//   shell.openExternal(`https://pagtion.vercel.app/reset`);
+// })
 
 //Смена темы
 ipcMain.handle("ToggleTheme", (event, theme: Theme) => {
@@ -99,51 +100,51 @@ ipcMain.handle("ToggleTheme", (event, theme: Theme) => {
 });
 
 //Не допускать открытие нового окна. Передача данных из окна браузера
-const gotTheLock = app.requestSingleInstanceLock();
-if (!gotTheLock) {
-  app.quit();
-} else {
-  app.on('second-instance', async (event, argv, workingDirectory) => {
-    const deepLink = argv.find(arg => arg.startsWith('pagtion://'));
-    if (deepLink) {
+// const gotTheLock = app.requestSingleInstanceLock();
+// if (!gotTheLock) {
+//   app.quit();
+// } else {
+//   app.on('second-instance', async (event, argv, workingDirectory) => {
+//     const deepLink = argv.find(arg => arg.startsWith('pagtion://'));
+//     if (deepLink) {
 
-      const parsedUrl = new URL(deepLink);
+//       const parsedUrl = new URL(deepLink);
 
-      const user: IUser = {
-        id: parsedUrl.searchParams.get("id")!,
-        email: parsedUrl.searchParams.get("email")!,
-        name: parsedUrl.searchParams.get("name")!,
-        image: parsedUrl.searchParams.get("image")!,
-      }
+//       const user: IUser = {
+//         id: parsedUrl.searchParams.get("id")!,
+//         email: parsedUrl.searchParams.get("email")!,
+//         name: parsedUrl.searchParams.get("name")!,
+//         image: parsedUrl.searchParams.get("image")!,
+//       }
 
-      if (mainWindow) {
+//       if (mainWindow) {
         
-        await LoadData(user.id);
+//         await LoadData(user.id);
 
-        // await fetchData(user.id);
+//         // await fetchData(user.id);
         
-        await directoryUserData.saveUserFile(user);
+//         await directoryUserData.saveUserFile(user);
 
-        await directoryLO.createListOpearionFile(user.id);
+//         await directoryLO.createListOpearionFile(user.id);
 
-        // await directoryNotes.readNotesDirectory();
+//         // await directoryNotes.readNotesDirectory();
 
-        mainWindow.webContents.send("deep-link", user);
+//         mainWindow.webContents.send("deep-link", user);
 
-        mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
+//         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"), {hash: "/document/startPage"});
         
-        mainWindow.focus();
-      }
-    }
-  });
-}
+//         mainWindow.focus();
+//       }
+//     }
+//   });
+// }
 //Получение глубокой ссылки с macOS
 app.on("open-url", async (event, url) => {
   event.preventDefault();
   const parsedUrl = new URL(url);
   const user: IUser = {
     id: parsedUrl.searchParams.get("id")!,
-    email: parsedUrl.searchParams.get("email")!,
+    // email: parsedUrl.searchParams.get("email")!,
     name: parsedUrl.searchParams.get("name")!,
     image: parsedUrl.searchParams.get("image")!,
   }
