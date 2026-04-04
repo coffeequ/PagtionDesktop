@@ -1,4 +1,4 @@
-import { app, net } from "electron";
+import { app } from "electron";
 import { IUser } from "../interfaces/IUser.js";
 import path from "path";
 import { existsSync, mkdirSync, readFile, writeFile } from "fs";
@@ -7,7 +7,6 @@ import { rm } from "fs/promises";
 
 export class UserData implements IUser{
     id: string = "";
-    email: string = "";
     name: string = "";
     image: string | null = "";
 
